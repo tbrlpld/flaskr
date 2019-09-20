@@ -20,6 +20,23 @@ def index():
     return render_template("blog/index.html", posts=posts)
 
 
+@bp.route("/<int:id>/detail", methods=("GET",))
+def detail(id):
+    """
+    Display a detail page with only one post
+    """
+    db = get_db()
+    post = db.execute(
+        "SELECT p.id, title, body, created, author_id, username"
+        " FROM post p JOIN user u on p.author_id = u.id"
+        " WHERE p.id = ?", (id,)
+    ).fetchone()
+    if post is not None:
+        return render_template("blog/detail.html", post=post)
+    else:
+        abort(404)
+
+
 @bp.route("/create", methods=("GET", "POST"))
 @login_required
 def create():

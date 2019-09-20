@@ -4,7 +4,7 @@ from flaskr.db import get_db
 
 
 def test_index(client, auth):
-    # When not logged in, the index should should links to register or log in
+    # When not logged in, the index should show links to register or log in
     response = client.get("/")
     assert b"Log In" in response.data
     assert b"Register" in response.data
@@ -15,6 +15,29 @@ def test_index(client, auth):
     assert b"test title" in response.data
     assert b"by test on 2018-01-01" in response.data
     assert b"test\nbody" in response.data
+    assert b'href="/1/update"' in response.data
+    assert b'href="/1/detail"' in response.data
+
+
+def test_detail(client, auth):
+    """
+    The detail page should be reachable without being logged in.
+    Post should be visible. So should the information.
+
+    When logged in as the author, an edit link should be shown.
+    """
+    response = client.get("/100/detail")
+    assert response.status_code == 404
+
+    response = client.get("/1/detail")
+    assert response.status_code == 200
+    assert b"test title" in response.data
+    assert b"by test on 2018-01-01" in response.data
+    assert b"test\nbody" in response.data
+    assert b'href="/1/update"' not in response.data
+
+    auth.login()
+    response = client.get("/1/detail")
     assert b'href="/1/update"' in response.data
 
 
