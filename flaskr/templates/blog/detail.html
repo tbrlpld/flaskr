@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "blog/comments.html" import display_comments_container %}
 
 {% block header %}
 	<h1>{% block title %}{{ post['title'] }}{% endblock%}</h1>
@@ -16,5 +17,7 @@
 		</header>
 		<p class="body">{{ post['body'] }}</p>
 	</article>
+	<hr>
+	{{ display_comments_container(post_id=post["id"], logged_in_user=g.user) }}
 {% endblock %}
 
