@@ -66,3 +66,10 @@ def test_delete(client, auth, app):
         ).fetchone()[0]
         assert count_after_deletion == count_before_deletion - 1
         assert response.headers["Location"] == "http://localhost/1/detail"
+
+
+def test_post_author_sees_delete_button_on_detail(client, auth):
+    response = client.get("/1/detail")
+    assert 'href="/comments/1/delete"' not in response.data
+
+    # auth.login()
