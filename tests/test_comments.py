@@ -37,3 +37,32 @@ def test_comments_shown_on_detail(client):
         "/1/detail", data={"post_id": 1, "body": ""}
     )
     assert b"test comment body" in response.data
+
+
+def test_delete(client, auth, app):
+    # Redirection when not logged in
+    response = client.post("/comments/1/delete")
+    assert response.headers["Location"] == "http://localhost/auth/login"
+
+    # Comment deletion forbidden when not the author of the post the comment
+    # belongs to.
+    # Other is the author of the comment but not of the post, thus can not
+    # delete the comment.
+    auth.login(username="other", password="other")
+    response = client.post("/comments/1/delete")
+    assert response.status_code == 403  # Forbidden
+    auth.logout()
+
+    # Logging in in the author of the post
+    auth.login()
+    with app.app_context():
+        db = get_db()
+        count_before_deletion = db.execute(
+            "SELECT COUNT(id) FROM comment"
+        ).fetchone()[0]
+        response = client.post("/comments/1/delete")
+        count_after_deletion = db.execute(
+            "SELECT COUNT(id) FROM comment"
+        ).fetchone()[0]
+        assert count_after_deletion == count_before_deletion - 1
+        assert response.headers["Location"] == "http://localhost/1/detail"
