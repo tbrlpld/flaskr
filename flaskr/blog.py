@@ -4,6 +4,7 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
+from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 
 bp = Blueprint("blog", __name__)
@@ -43,8 +44,10 @@ def detail(id):
     Display a detail page with only one post
     """
     post = get_post(id, check_author=False)
+    comments = get_comments_for_post(post_id=id)
     if post is not None:
-        return render_template("blog/detail.html", post=post)
+        return render_template("blog/detail.html", post=post,
+                               comments=comments)
     else:
         abort(404)
 

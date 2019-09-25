@@ -4,7 +4,7 @@ from flask import (
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.blog import get_post
+# from flaskr.blog import get_post
 from flaskr.db import get_db
 
 bp = Blueprint("comments", __name__, url_prefix="/comments")
@@ -28,7 +28,7 @@ def get_comments_for_post(post_id=None):
 @bp.route("/create", methods=("POST",))
 @login_required
 def create():
-    post = get_post(request.form["post_id"])
+    post_id = request.form["post_id"]
     body = request.form["body"]
     error = None
 
@@ -43,7 +43,7 @@ def create():
         db.execute(
             "INSERT INTO comment (author_id, post_id, body)"
             " VALUES (?, ?, ?)",
-            (g.user["id"], post["id"], body)
+            (g.user["id"], post_id, body)
         )
         db.commit()
-    return redirect(url_for("blog.detail", id=post["id"]))
+    return redirect(url_for("blog.detail", id=post_id))

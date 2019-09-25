@@ -1,6 +1,18 @@
-{%- macro display_comments_container(post_id, logged_in_user=None) %}
+{%- macro display_comments_container(comments, post_id, logged_in_user=None) %}
 	<div class="comment-container">
 		<h2>Comments</h2>
+		{% if comments %}
+				{% for comment in comments %}
+					<div class="comment">
+						<div>
+							<div class="about">{{ comment["username"] }} on {{ comment["created"] }}</div>
+						</div>
+						<div>
+							{{ comment["body"] }}
+						</div>
+					</div>
+				{% endfor %}			
+		{% endif %}
 		{% if logged_in_user %}
 			<h3>Add a Comment</h3>
 			<form action="{{ url_for('comments.create') }}" method="post">

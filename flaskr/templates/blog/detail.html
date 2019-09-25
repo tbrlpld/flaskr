@@ -18,6 +18,6 @@
 		<p class="body">{{ post['body'] }}</p>
 	</article>
 	<hr>
-	{{ display_comments_container(post_id=post["id"], logged_in_user=g.user) }}
+	{{ display_comments_container(comments=comments, post_id=post["id"], logged_in_user=g.user) }}
 {% endblock %}
 

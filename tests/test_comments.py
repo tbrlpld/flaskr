@@ -30,3 +30,10 @@ def test_get_comments(app):
         assert len(comments) == 1
         assert "test comment body" in comments[0]["body"]
         assert comments[0]["username"] == "other"
+
+
+def test_comments_shown_on_detail(client):
+    response = client.get(
+        "/1/detail", data={"post_id": 1, "body": ""}
+    )
+    assert b"test comment body" in response.data

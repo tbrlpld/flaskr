@@ -28,4 +28,13 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .comment-container {
 	margin: 0 auto;
 	width: 80%;
+	font-size: smaller;
+}
+.comment {
+	margin: 1rem 0 ;
+}
+.comment .about {
+	margin-bottom: 0.1rem;
+	color: slategray;
+	font-style: italic;
 }
