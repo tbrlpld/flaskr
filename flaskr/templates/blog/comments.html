@@ -1,12 +1,19 @@
-{%- macro display_comments_container(comments, post_id, logged_in_user=None) %}
+{%- macro display_comments_container(comments, post_id, logged_in_user=None, user_is_post_author=False) %}
 	<div class="comment-container">
 		<h2>Comments</h2>
 		{% if comments %}
 				{% for comment in comments %}
 					<div class="comment">
-						<div>
-							<div class="about">{{ comment["username"] }} on {{ comment["created"] }}</div>
-						</div>
+						<header>
+							<div class="about">
+								{{ comment["username"] }} on {{ comment["created"] }}
+							</div>
+							{% if user_is_post_author %}
+								<form action="{{ url_for('comments.delete', id=comment['id'])}}" method="post">
+									<button class="btn-link" type="submit">Delete</button>
+								</form>
+							{% endif %}
+						</header>
 						<div>
 							{{ comment["body"] }}
 						</div>

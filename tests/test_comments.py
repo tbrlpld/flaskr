@@ -70,6 +70,7 @@ def test_delete(client, auth, app):
 
 def test_post_author_sees_delete_button_on_detail(client, auth):
     response = client.get("/1/detail")
-    assert 'href="/comments/1/delete"' not in response.data
+    assert b'href="/comments/1/delete"' not in response.data
 
-    # auth.login()
+    auth.login()
+    assert b'href="/comments/1/delete"' in response.data

@@ -33,8 +33,26 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .comment {
 	margin: 1rem 0 ;
 }
-.comment .about {
+.comment header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 	margin-bottom: 0.1rem;
+}
+.comment header .about {
 	color: slategray;
 	font-style: italic;
+}
+.comment header form {
+	display: inline;
+	margin: 0;
+}
+.btn-link {
+	border: none;
+	color: #377ba8;
+	background: none;
+	display: inline;
+}
+.btn-link:hover {
+	text-decoration: underline;
 }
