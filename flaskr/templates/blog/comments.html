@@ -18,7 +18,9 @@
 							{{ comment["body"] }}
 						</div>
 					</div>
-				{% endfor %}			
+				{% endfor %}
+		{% else %}
+			<i>No comments yet.</i>
 		{% endif %}
 		{% if logged_in_user %}
 			<h3>Add a Comment</h3>
