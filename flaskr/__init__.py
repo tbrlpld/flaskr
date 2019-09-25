@@ -42,4 +42,7 @@ def create_app(test_config=None):
     from . import comments
     app.register_blueprint(comments.bp)
 
+    from . import likes
+    app.register_blueprint(likes.bp)
+
     return app
