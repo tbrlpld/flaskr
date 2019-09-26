@@ -1,3 +1,5 @@
+from flask import url_for
+
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 
@@ -70,7 +72,9 @@ def test_delete(client, auth, app):
 
 def test_post_author_sees_delete_button_on_detail(client, auth):
     response = client.get("/1/detail")
-    assert b'href="/comments/1/delete"' not in response.data
+    assert b"/comments/1/delete" not in response.data
 
     auth.login()
-    assert b'href="/comments/1/delete"' in response.data
+    response = client.get("/1/detail")
+    assert b"Comments" in response.data
+    assert b"/comments/1/delete" in response.data
