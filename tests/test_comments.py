@@ -33,6 +33,9 @@ def test_get_comments(app):
         assert "test comment body" in comments[0]["body"]
         assert comments[0]["username"] == "other"
 
+    # None is returned when no post is defined
+    assert get_comments_for_post() is None
+
 
 def test_comments_shown_on_detail(client):
     response = client.get(

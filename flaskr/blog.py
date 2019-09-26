@@ -45,11 +45,10 @@ def detail(id):
     """
     post = get_post(id, check_author=False)
     comments = get_comments_for_post(post_id=id)
-    if post is not None:
-        return render_template("blog/detail.html", post=post,
-                               comments=comments)
-    else:
-        abort(404)
+
+    # Post existence is already checked in get_post
+    return render_template("blog/detail.html", post=post,
+                           comments=comments)
 
 
 @bp.route("/create", methods=("GET", "POST"))

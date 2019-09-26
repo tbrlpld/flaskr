@@ -27,3 +27,19 @@ def create():
         abort(403, "Like already exists")
 
     return redirect(url_for("blog.detail", id=post_id))
+
+
+@bp.route("/delete", methods=("POST",))
+@login_required
+def delete():
+    post_id = request.form["post_id"]
+    user_id = g.user["id"]
+
+    db = get_db()
+    db.execute(
+        "DELETE FROM like WHERE user_id = ? AND post_id = ?",
+        (user_id, post_id)
+    )
+    db.commit()
+
+    return redirect(url_for("blog.detail", id=post_id))

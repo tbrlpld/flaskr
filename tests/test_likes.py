@@ -30,6 +30,20 @@ def test_no_double_like(client, auth, app):
     assert response.status_code == 403  #  Forbidden
 
 
+def test_delete(client, auth, app):
+    auth.login(username="other", password="other")
+
+    with app.app_context():
+        db = get_db()
+        likes_before = db.execute(
+            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+        response = client.post("/likes/delete", data={"post_id": 1})
+        assert response.headers["Location"] == "http://localhost/1/detail"
+        likes_after = db.execute(
+            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+        assert likes_after == likes_before - 1
+
+
 def test_logged_in_user_sees_like_link(client, auth, app):
     # No link when not logged in
     response = client.get("/1/detail")
@@ -46,3 +60,8 @@ def test_logged_in_user_sees_like_link(client, auth, app):
     auth.login()
     response = client.get("/1/detail")
     assert b"/likes/create" in response.data
+    auth.logout()
+
+    # User with existing like sees unlike link
+
+
