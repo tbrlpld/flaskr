@@ -33,12 +33,10 @@ def test_get_or_create_tag_from_string(app):
 
 
 def test_create_tag_through_create_post(client, auth, app):
-    auth.login()
-
+    auth.login()  # Only logged-in users can create posts
     # The test_request_context allows to use `url_for` outside of a request
-    # context
+    # context.
     with app.test_request_context("/"):
-
         db = get_db()
 
         tags_in_db = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
@@ -47,6 +45,26 @@ def test_create_tag_through_create_post(client, auth, app):
         client.post(url_for("blog.create"), data={
             "title": "A new Post",
             "body": "This is the content of the new post.",
+            "tags": "testtag newtag"
+        })
+
+        tags_in_db = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
+        assert tags_in_db == 2
+
+
+def test_create_tag_through_update_post(client, auth, app):
+    auth.login()  # Only logged-in users can update posts
+    # The test_request_context allows to use `url_for` outside of a request
+    # context.
+    with app.test_request_context("/"):
+        db = get_db()
+
+        tags_in_db = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
+        assert tags_in_db == 1
+
+        client.post(url_for("blog.update", id=1), data={
+            "title": "A title",
+            "body": "This is the new content of the new post.",
             "tags": "testtag newtag"
         })
 
