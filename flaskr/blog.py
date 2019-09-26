@@ -96,7 +96,11 @@ def update(id):
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
+        tag_string = request.form.get("tags", None)
         error = None
+
+        if tag_string:
+            tag_ids = get_or_create_tags_from_string(tag_string)
 
         if not title:
             error = "Title is required."
