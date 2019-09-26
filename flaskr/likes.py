@@ -9,6 +9,16 @@ from flaskr.db import get_db
 bp = Blueprint("likes", __name__, url_prefix="/likes")
 
 
+def get_users_liking_post(post_id):
+    db = get_db()
+    likes = db.execute(
+        "SELECT post_id, user_id FROM like WHERE post_id = ?",
+        (post_id,)
+    ).fetchall()
+    user_ids = [like[1] for like in likes]
+    return user_ids
+
+
 @bp.route("/create", methods=("POST",))
 @login_required
 def create():

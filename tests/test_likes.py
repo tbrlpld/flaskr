@@ -1,4 +1,24 @@
 from flaskr.db import get_db
+from flaskr.likes import get_users_liking_post
+
+
+def test_get_likes_for_post(app):
+    # There is already one like in the db, created by user 2.
+    with app.app_context():
+        user_id = 2
+        users_liking_post = get_users_liking_post(post_id=1)
+        print(users_liking_post)
+        assert user_id in users_liking_post
+
+        db = get_db()
+        db.execute(
+            "INSERT INTO like (user_id, post_id)"
+            " VALUES (1, 1)"
+        )
+        db.commit()
+        users_liking_post = get_users_liking_post(post_id=1)
+        print(users_liking_post)
+        assert 1 in users_liking_post
 
 
 def test_create(client, auth, app):
