@@ -63,5 +63,14 @@ def test_logged_in_user_sees_like_link(client, auth, app):
     auth.logout()
 
     # User with existing like sees unlike link
-
-
+    with app.app_context():
+        db = get_db()
+        # Making sure that there is a like by the user for the post
+        like_count = db.execute(
+            "SELECT COUNT(post_id) FROM like WHERE post_id = 1 AND user_id = 2"
+        ).fetchone()[0]
+        assert like_count == 1
+    auth.login(username="other", password="other")
+    response = client.get("/1/detail")
+    assert b"/likes/delete" in response.data
+    auth.logout()

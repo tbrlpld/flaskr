@@ -33,6 +33,8 @@ def create():
 @login_required
 def delete():
     post_id = request.form["post_id"]
+    # Grabbing the logged in user. It is not possible trying to remove other
+    # users likes.
     user_id = g.user["id"]
 
     db = get_db()
