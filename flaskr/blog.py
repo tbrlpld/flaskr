@@ -79,6 +79,7 @@ def update_post(id, title, body):
 
 
 def create_or_update_post(id=None):
+    post = None
     if id:
         post = get_post(id)
 
@@ -103,10 +104,7 @@ def create_or_update_post(id=None):
                 create_post(title, body)
             return redirect(url_for("blog.index"))
 
-    if id:
-        return render_template("blog/update.html", post=post)
-    else:
-        return render_template("blog/create.html")
+    return render_template("blog/create_or_update.html", post=post)
 
 
 @bp.route("/create", methods=("GET", "POST"))
