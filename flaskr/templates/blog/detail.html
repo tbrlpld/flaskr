@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% from "blog/comments.html" import display_comments_container %}
+{% from "comments/comments.html" import display_comments_container %}
+{% from "likes/likes.html" import display_like_links %}
 
 {% block header %}
 	<h1>{% block title %}{{ post['title'] }}{% endblock%}</h1>
@@ -16,11 +17,19 @@
 			{% endif %}
 		</header>
 		<p class="body">{{ post['body'] }}</p>
+		<footer>
+			<div class="like-container">
+				<span>{{ users_likes|length }} Likes</span>
+				{% if g.user %}
+					{{ display_like_links(post_id=post['id'], liked=(g.user['id'] in users_likes)) }}
+				{% endif %}
+			</div>
+		</footer>
 	</article>
 	<hr>
 	{{ display_comments_container(
-		comments=comments, 
-		post_id=post["id"], 
+		comments=comments,
+		post_id=post["id"],
 		logged_in_user=g.user,
 		user_is_post_author=(g.user["id"] == post["author_id"])
 	) }}

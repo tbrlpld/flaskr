@@ -10,3 +10,7 @@ VALUES
 INSERT INTO comment (body, author_id, post_id, created)
 VALUES
 	('test comment body', 2, 1, '2018-01-01 00:00:01');	
+
+INSERT INTO like (user_id, post_id, created)
+VALUES
+	(2, 1, '2018-01-01 00:00:02');

@@ -6,6 +6,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
+from flaskr.likes import get_users_liking_post
 
 bp = Blueprint("blog", __name__)
 
@@ -45,11 +46,15 @@ def detail(id):
     """
     post = get_post(id, check_author=False)
     comments = get_comments_for_post(post_id=id)
-    if post is not None:
-        return render_template("blog/detail.html", post=post,
-                               comments=comments)
-    else:
-        abort(404)
+    users_likes = get_users_liking_post(post_id=id)
+
+    # Post existence is already checked in get_post
+    return render_template(
+        "blog/detail.html",
+        post=post,
+        comments=comments,
+        users_likes=users_likes
+    )
 
 
 @bp.route("/create", methods=("GET", "POST"))

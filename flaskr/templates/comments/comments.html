@@ -9,7 +9,7 @@
 								{{ comment["username"] }} on {{ comment["created"] }}
 							</div>
 							{% if user_is_post_author %}
-								<form action="{{ url_for('comments.delete', id=comment['id'])}}" method="post">
+								<form action="{{ url_for('comments.delete', id=comment['id']) }}" method="post">
 									<button class="btn-link" type="submit">Delete</button>
 								</form>
 							{% endif %}
