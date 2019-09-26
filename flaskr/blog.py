@@ -58,9 +58,30 @@ def detail(id):
     )
 
 
-@bp.route("/create", methods=("GET", "POST"))
-@login_required
-def create():
+def create_post(title, body):
+    db = get_db()
+    db.execute(
+        "INSERT INTO post (title, body, author_id)"
+        " VALUES (?, ?, ?)",
+        (title, body, g.user["id"])
+    )
+    db.commit()
+
+
+def update_post(id, title, body):
+    db = get_db()
+    db.execute(
+        "UPDATE post SET title = ?, body = ?"
+        " WHERE id = ?",
+        (title, body, id)
+    )
+    db.commit()
+
+
+def create_or_update_post(id=None):
+    if id:
+        post = get_post(id)
+
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
@@ -76,48 +97,28 @@ def create():
         if error is not None:
             flash(error)
         else:
-            db = get_db()
-            db.execute(
-                "INSERT INTO post (title, body, author_id)"
-                " VALUES (?, ?, ?)",
-                (title, body, g.user["id"])
-            )
-            db.commit()
+            if id:
+                update_post(id, title, body)
+            else:
+                create_post(title, body)
             return redirect(url_for("blog.index"))
 
-    return render_template("blog/create.html")
+    if id:
+        return render_template("blog/update.html", post=post)
+    else:
+        return render_template("blog/create.html")
+
+
+@bp.route("/create", methods=("GET", "POST"))
+@login_required
+def create():
+    return create_or_update_post()
 
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))
 @login_required
 def update(id):
-    post = get_post(id)
-
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
-        tag_string = request.form.get("tags", None)
-        error = None
-
-        if tag_string:
-            tag_ids = get_or_create_tags_from_string(tag_string)
-
-        if not title:
-            error = "Title is required."
-
-        if error is not None:
-            flash(error)
-        else:
-            db = get_db()
-            db.execute(
-                "UPDATE post SET title = ?, body = ?"
-                " WHERE id = ?",
-                (title, body, id)
-            )
-            db.commit()
-            return redirect(url_for("blog.index"))
-
-    return render_template("blog/update.html", post=post)
+    return create_or_update_post(id=id)
 
 
 @bp.route("/<int:id>/delete", methods=("POST",))
