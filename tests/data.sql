@@ -14,3 +14,7 @@ VALUES
 INSERT INTO like (user_id, post_id, created)
 VALUES
 	(2, 1, '2018-01-01 00:00:02');
+
+INSERT INTO tag (name, created)
+VALUES
+	('testtag', '2018-01-01 00:00:03');
