@@ -7,6 +7,7 @@ from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
+from flaskr.tags import get_or_create_tags_from_string
 
 bp = Blueprint("blog", __name__)
 
@@ -63,7 +64,11 @@ def create():
     if request.method == "POST":
         title = request.form["title"]
         body = request.form["body"]
+        tag_string = request.form.get("tags", None)
         error = None
+
+        if tag_string:
+            tag_ids = get_or_create_tags_from_string(tag_string)
 
         if not title:
             error = "Title is required."
