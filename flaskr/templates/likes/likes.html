@@ -2,12 +2,12 @@
 	{% if not liked %}
 		<form action="{{ url_for('likes.create') }}" method="post">
 			<input type="hidden" name="post_id" value="{{ post_id }}">
-			<button type="submit">Like</button>
+			<button type="submit" class="btn-link">Like</button>
 		</form>
 	{% else %}
 		<form action="{{ url_for('likes.delete') }}" method="post">
 			<input type="hidden" name="post_id" value="{{ post_id }}">
-			<button type="submit">Unlike</button>
+			<button type="submit" class="btn-link">Unlike</button>
 		</form>
 	{% endif %}
 {% endmacro -%}

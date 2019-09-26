@@ -56,3 +56,11 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .btn-link:hover {
 	text-decoration: underline;
 }
+.like-container {
+	display: block;
+	font-size: small;
+	border-top: 1px solid lightgray;
+}
+.like-container form {
+	display: inline;
+}
