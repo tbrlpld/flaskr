@@ -60,10 +60,23 @@ def test_remove_tag_associations_for_post(app):
     with app.app_context():
         tags = get_tags_for_post(post_id=1)
         assert "testtag" in tags
-        tag_id = get_or_create_tag("testtag")
+
         remove_tag_associations_for_post(post_id=1)
         tags = get_tags_for_post(post_id=1)
         assert "testtag" not in tags
+        assert tags == []
+
+
+def test_deleting_post_removed_tag_associations(client, auth, app):
+    auth.login()
+    with app.test_request_context():
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" in tags
+
+        client.post(url_for("blog.delete", id=1))
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" not in tags
+        assert tags == []
 
 
 def test_get_tags_for_post(auth, client, app):

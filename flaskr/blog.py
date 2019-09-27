@@ -8,7 +8,8 @@ from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
 from flaskr.tags import (
-    get_or_create_tags_from_string, associate_tag_with_post, get_tags_for_post)
+    get_or_create_tags_from_string, associate_tag_with_post, get_tags_for_post,
+    remove_tag_associations_for_post)
 
 bp = Blueprint("blog", __name__)
 
@@ -148,4 +149,5 @@ def delete(id):
     db = get_db()
     db.execute("DELETE FROM post WHERE id = ?", (id, ))
     db.commit()
+    remove_tag_associations_for_post(post_id=id)
     return redirect(url_for("blog.index"))
