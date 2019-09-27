@@ -132,9 +132,9 @@ def test_create_tag_through_update_post(client, auth, app):
         assert "newtag" in tags
 
 
-# def test_tags_input_field_shows_existing_tags(client, auth, app):
-#     auth.login()
+def test_tags_input_field_shows_existing_tags(client, auth, app):
+    auth.login()
 
-#     with app.test_request_context("/"):
-#         response = client.get(url_for("blog.update", id=1))
-#         assert b"testtag" in response.data
+    with app.test_request_context("/"):
+        response = client.get(url_for("blog.update", id=1))
+        assert b"testtag" in response.data

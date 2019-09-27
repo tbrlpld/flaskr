@@ -7,7 +7,8 @@ from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
-from flaskr.tags import get_or_create_tags_from_string, associate_tag_with_post
+from flaskr.tags import (
+    get_or_create_tags_from_string, associate_tag_with_post, get_tags_for_post)
 
 bp = Blueprint("blog", __name__)
 
@@ -96,8 +97,10 @@ def update_post(id, title, body):
 
 def create_or_update_post(id=None):
     post = None
+    tags = []
     if id:
-        post = get_post(id)
+        post = get_post(id)  # Handles not existing id requests
+        tags = get_tags_for_post(post_id=id)
 
     if request.method == "POST":
         title = request.form["title"]
@@ -123,7 +126,7 @@ def create_or_update_post(id=None):
                 associate_tag_with_post(tag_id=tag_id, post_id=id)
             return redirect(url_for("blog.index"))
 
-    return render_template("blog/create_or_update.html", post=post)
+    return render_template("blog/create_or_update.html", post=post, tags=tags)
 
 
 @bp.route("/create", methods=("GET", "POST"))

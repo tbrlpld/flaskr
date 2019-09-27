@@ -23,7 +23,7 @@
 
 		<label for="tags">Tags</label>
 		<input name="tags" id="tags"
-			value="{{ request.form['tags'] or post['tags'] }}" required>
+			value="{{ ' '.join(tags) }}">
 
 		<input type="submit" value="Save">
 	</form>
