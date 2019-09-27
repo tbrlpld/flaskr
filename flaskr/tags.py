@@ -43,3 +43,39 @@ def get_or_create_tags_from_string(tag_string):
     tag_names = tag_string.split(" ")
     return tuple([get_or_create_tag(t) for t in tag_names])
 
+
+def get_tags_for_post(post_id):
+    """
+    Get the tag ids associated with the post.
+
+    :param post_id: Id of the post for which the tags should be retrieved.
+    :type post_id: int
+
+    :returns: List of tag names which are associated with the post.
+    :rtype: list
+    """
+    db = get_db()
+    associated_tag_rows = db.execute(
+        "SELECT (t.name) FROM tag t JOIN post_tag pt ON t.id = pt.tag_id"
+        " WHERE pt.post_id = ?",
+        (post_id,)
+    ).fetchall()
+    return [row["name"] for row in associated_tag_rows]
+
+
+def associate_tag_with_post(tag_id, post_id):
+    """
+    Create an association/relationship between a given tag id and post id.
+
+    :param tag_id: Id of the tag which shall be associated with the post.
+    :type tag_id: int
+
+    :param post_id: Id of the post with which the tag shall be associated.
+    :type post_id: int
+    """
+    db = get_db()
+    db.execute(
+        "INSERT OR IGNORE INTO post_tag (tag_id, post_id)"
+        " VALUES (?, ?)", (tag_id, post_id)
+    )
+    db.commit()

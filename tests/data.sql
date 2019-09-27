@@ -18,3 +18,7 @@ VALUES
 INSERT INTO tag (name, created)
 VALUES
 	('testtag', '2018-01-01 00:00:03');
+
+INSERT INTO post_tag (post_id, tag_id)
+VALUES
+	(1, 1);
