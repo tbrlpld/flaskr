@@ -3,7 +3,8 @@ from flask import url_for
 from flaskr.db import get_db
 from flaskr.tags import (
     get_or_create_tag, get_or_create_tags_from_string,
-    get_tags_for_post, associate_tag_with_post
+    get_tags_for_post, associate_tag_with_post,
+    remove_tag_associations_for_post
 )
 
 
@@ -53,6 +54,16 @@ def test_associate_tag_with_post(app):
         tags = get_tags_for_post(post_id=1)
         assert "testtag" in tags
         assert "newtag" in tags
+
+
+def test_remove_tag_associations_for_post(app):
+    with app.app_context():
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" in tags
+        tag_id = get_or_create_tag("testtag")
+        remove_tag_associations_for_post(post_id=1)
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" not in tags
 
 
 def test_get_tags_for_post(auth, client, app):

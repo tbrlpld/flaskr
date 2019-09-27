@@ -99,7 +99,7 @@ def create_or_update_post(id=None):
     post = None
     tags = []
     if id:
-        post = get_post(id)  # Handles not existing id requests
+        post = get_post(id)  # This is also to check existence and ownership
         tags = get_tags_for_post(post_id=id)
 
     if request.method == "POST":
@@ -144,7 +144,7 @@ def update(id):
 @bp.route("/<int:id>/delete", methods=("POST",))
 @login_required
 def delete(id):
-    get_post(id)  # This is to check permissions
+    get_post(id)  # This is to check  existence and ownership
     db = get_db()
     db.execute("DELETE FROM post WHERE id = ?", (id, ))
     db.commit()

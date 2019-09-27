@@ -79,3 +79,17 @@ def associate_tag_with_post(tag_id, post_id):
         " VALUES (?, ?)", (tag_id, post_id)
     )
     db.commit()
+
+
+def remove_tag_associations_for_post(post_id):
+    """
+    Remove all tag association for a post.
+
+    :param post_id: Id of the post for which the associations should be removed
+    :type post_id: int
+    """
+    db = get_db()
+    db.execute(
+        "DELETE FROM post_tag WHERE post_id = ?", (post_id,)
+    )
+    db.commit()
