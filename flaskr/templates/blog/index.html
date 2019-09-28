@@ -20,6 +20,11 @@
 				{% endif %}
 			</header>
 			<p class="body">{{ post['body'] }}</p>
+			<footer>
+				{% for tag in post['tag_string'].split(' ')%}
+					<span class="tag">{{ tag }}</span>
+				{% endfor %}
+			</footer>
 		</article>
 		{% if not loop.last %}
 			<hr>

@@ -8,7 +8,7 @@ from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
 from flaskr.tags import (
-    get_or_create_tags_from_string, associate_tag_with_post, get_tags_for_post,
+    get_or_create_tags_from_string, associate_tag_with_post,
     remove_tag_associations_for_post)
 
 bp = Blueprint("blog", __name__)
@@ -16,9 +16,14 @@ bp = Blueprint("blog", __name__)
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        "SELECT p.id, title, body, created, author_id, username"
-        " FROM post p JOIN user u ON p.author_id = u.id"
-        " WHERE p.id = ?",
+        "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
+        " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        " FROM post p"
+        " JOIN user u ON p.author_id = u.id"
+        " JOIN post_tag pt ON p.id = pt.post_id"
+        " JOIN tag t ON pt.tag_id = t.id"
+        " WHERE p.id = ?"
+        " GROUP BY p.id",
         (id,)
     ).fetchone()
 
@@ -35,9 +40,14 @@ def get_post(id, check_author=True):
 def index():
     db = get_db()
     posts = db.execute(
-        "SELECT p.id, title, body, created, author_id, username"
-        " FROM post p JOIN user u ON p.author_id = u.id"
-        " ORDER BY created DESC"
+        "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
+        " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        " FROM post p"
+        " JOIN user u ON p.author_id = u.id"
+        " JOIN post_tag pt ON p.id = pt.post_id"
+        " JOIN tag t ON pt.tag_id = t.id"
+        " GROUP BY p.id"
+        " ORDER BY p.created DESC"
     ).fetchall()
     return render_template("blog/index.html", posts=posts)
 
@@ -98,10 +108,8 @@ def update_post(id, title, body):
 
 def create_or_update_post(id=None):
     post = None
-    tags = []
     if id:
         post = get_post(id)  # This is also to check existence and ownership
-        tags = get_tags_for_post(post_id=id)
 
     if request.method == "POST":
         title = request.form["title"]
@@ -127,7 +135,7 @@ def create_or_update_post(id=None):
                 associate_tag_with_post(tag_id=tag_id, post_id=id)
             return redirect(url_for("blog.index"))
 
-    return render_template("blog/create_or_update.html", post=post, tags=tags)
+    return render_template("blog/create_or_update.html", post=post)
 
 
 @bp.route("/create", methods=("GET", "POST"))

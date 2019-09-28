@@ -162,3 +162,47 @@ def test_tags_input_field_shows_existing_tags(client, auth, app):
     with app.test_request_context("/"):
         response = client.get(url_for("blog.update", id=1))
         assert b"testtag" in response.data
+
+
+def test_tags_shown_on_index(client, auth, app):
+    auth.login()
+
+    with app.test_request_context("/"):
+        response = client.get(url_for("blog.index"))
+        assert b"testtag" in response.data
+
+
+def test_tags_shown_on_detail(client, auth, app):
+    auth.login()
+
+    with app.test_request_context("/"):
+        response = client.get(url_for("blog.detail", id=1))
+        assert b"testtag" in response.data
+
+
+# def test_something(app):
+#     with app.app_context():
+#         new_tag_id = get_or_create_tag("newtag")
+#         associate_tag_with_post(tag_id=new_tag_id, post_id=1)
+
+#         db = get_db()
+#         row = db.execute(
+#             "SELECT p.id, p.title, GROUP_CONCAT(t.name) AS tag_list"
+#             " FROM post p"
+#             " JOIN post_tag pt ON p.id = pt.post_id"
+#             " JOIN tag t ON pt.tag_id = t.id"
+#             " WHERE pt.post_id = 1"
+#         ).fetchone()
+#         print(tuple(row))
+#         print(row['tag_list'].split(","))
+
+#         rows = db.execute(
+#             "SELECT p.id, p.title, GROUP_CONCAT(t.name) AS tag_list"
+#             " FROM post p"
+#             " JOIN post_tag pt ON p.id = pt.post_id"
+#             " JOIN tag t ON pt.tag_id = t.id"
+#         ).fetchall()
+#         print(tuple(rows))
+#         for r in rows:
+#             print(tuple(r))
+#             print(r['tag_list'].split(","))
