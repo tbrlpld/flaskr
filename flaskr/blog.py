@@ -20,8 +20,9 @@ def get_post(id, check_author=True):
         " GROUP_CONCAT(t.name, ' ') AS tag_string"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
-        " JOIN post_tag pt ON p.id = pt.post_id"
-        " JOIN tag t ON pt.tag_id = t.id"
+        # LEFT JOIN makes the existence of values in the right table optional!
+        " LEFT JOIN post_tag pt ON p.id = pt.post_id"
+        " LEFT JOIN tag t ON pt.tag_id = t.id"
         " WHERE p.id = ?"
         " GROUP BY p.id",
         (id,)
@@ -44,8 +45,9 @@ def index():
         " GROUP_CONCAT(t.name, ' ') AS tag_string"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
-        " JOIN post_tag pt ON p.id = pt.post_id"
-        " JOIN tag t ON pt.tag_id = t.id"
+        # LEFT JOIN makes the existence of values in the right table optional!
+        " LEFT JOIN post_tag pt ON p.id = pt.post_id"
+        " LEFT JOIN tag t ON pt.tag_id = t.id"
         " GROUP BY p.id"
         " ORDER BY p.created DESC"
     ).fetchall()

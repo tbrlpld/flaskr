@@ -25,9 +25,11 @@
 				{% endif %}
 			</div>
 			<div class="tag-container">
-				{% for tag in post['tag_string'].split(' ')%}
-					<span class="tag">{{ tag }}</span>
-				{% endfor %}
+				{% if post['tag_string'] %}
+					{% for tag in post['tag_string'].split(' ') %}
+						<span class="tag">{{ tag }}</span>
+					{% endfor %}
+				{% endif %}
 			</div>
 		</footer>
 	</article>

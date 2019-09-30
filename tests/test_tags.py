@@ -180,6 +180,56 @@ def test_tags_shown_on_detail(client, auth, app):
         assert b"testtag" in response.data
 
 
+def test_post_without_tags_shown_on_index(client, auth, app):
+    """
+    When the solution to add the tags to the post object was added, to the
+    SQL statement to retrieve the post, this broke something so that no posts
+    without tags would be retrievable anymore!
+    This test is to check the functionality of not tagged posts.
+    """
+    auth.login()
+
+    with app.test_request_context("/"):
+        # Post without tags also in index
+        client.post("/create", data={
+            "title": "Without Tags", "body": "some body"})
+
+        response = client.get(url_for("blog.index"))
+        assert b"Without Tags" in response.data
+
+
+def test_detail_of_post_without_tag_still_works(client, auth, app):
+    """
+    When the solution to add the tags to the post object was added, to the
+    SQL statement to retrieve the post, this broke something so that no posts
+    without tags would be retrievable anymore!
+    This test is to check the functionality of not tagged posts.
+    """
+    auth.login()
+
+    with app.test_request_context("/"):
+        # Post without tags can be retrieved on detail page
+        client.post("/create", data={
+            "title": "Without Tags", "body": "some body"})
+        response = client.get(url_for("blog.detail", id=2))
+        assert b"Without Tags" in response.data
+
+
+def test_editing_a_post_without_tags_does_show_none_as_tag(client, auth, app):
+    """
+    When a post has no tags SQL will return NULL for the tag_string column.
+    But None (the Python NULL value) should not be printed in the tag_string.
+    """
+    auth.login()
+
+    with app.test_request_context("/"):
+        # Post without tags can be retrieved on detail page
+        client.post("/create", data={
+            "title": "Without Tags", "body": "some body"})
+        response = client.get(url_for("blog.update", id=2))
+        assert b"None" not in response.data
+
+
 # def test_something(app):
 #     with app.app_context():
 #         new_tag_id = get_or_create_tag("newtag")

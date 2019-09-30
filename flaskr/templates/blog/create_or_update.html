@@ -23,7 +23,7 @@
 
 		<label for="tags">Tags</label>
 		<input name="tags" id="tags"
-			value="{{ post['tag_string'] }}">
+			value="{{ post['tag_string'] or '' }}">
 
 		<input type="submit" value="Save">
 	</form>
