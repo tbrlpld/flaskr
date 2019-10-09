@@ -1,0 +1,9 @@
+{%- macro display_tag(tag) %}
+		<a href="{{ url_for('tags.display_tagged_posts', tag=tag) }}" class="tag-link"><span class="tag">{{ tag }}</span></a>
+{% endmacro -%}
+
+{%- macro display_tag_string(tag_string) %}
+	{% for tag in tag_string.split(' ') %}
+		{{ display_tag(tag) }}
+	{% endfor %}
+{% endmacro -%}
