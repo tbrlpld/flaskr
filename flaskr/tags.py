@@ -114,8 +114,7 @@ def update_tag_associations_for_post(tag_string, post_id):
     :param post_id: Id of the post the tags shall be associated with.
     :type post_id: int
     """
+    remove_tag_associations_for_post(post_id=post_id)
     tag_ids = get_or_create_tags_from_string(tag_string)
     for tag_id in tag_ids:
         associate_tag_with_post(tag_id=tag_id, post_id=post_id)
-
-

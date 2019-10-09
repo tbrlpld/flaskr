@@ -114,7 +114,7 @@ def test_update_tag_associations_for_post(app):
         tags = get_tags_for_post(post_id=1)
         assert "testtag" not in tags
         assert "newtag" not in tags
-        assert tags == tuple()
+        assert tags == []
 
 
 def test_deleting_post_removes_tag_associations(client, auth, app):
@@ -204,6 +204,26 @@ def test_create_tag_through_update_post(client, auth, app):
         tags = get_tags_for_post(post_id=1)
         assert "testtag" in tags
         assert "newtag" in tags
+
+
+def test_remove_tag_association_through_update_post(client, auth, app):
+    auth.login()  # Only logged-in users can update posts
+    # The test_request_context allows to use `url_for` outside of a request
+    # context.
+    with app.test_request_context("/"):
+        db = get_db()
+
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" in tags
+
+        client.post(url_for("blog.update", id=1), data={
+            "title": "A title",
+            "body": "This is the new content of the new post.",
+            "tags": ""
+        })
+
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" not in tags
 
 
 def test_tags_input_field_shows_existing_tags(client, auth, app):
