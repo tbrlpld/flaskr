@@ -24,6 +24,13 @@
 					{{ display_like_links(post_id=post['id'], liked=(g.user['id'] in users_likes)) }}
 				{% endif %}
 			</div>
+			<div class="tag-container">
+				{% if post['tag_string'] %}
+					{% for tag in post['tag_string'].split(' ') %}
+						<span class="tag">{{ tag }}</span>
+					{% endfor %}
+				{% endif %}
+			</div>
 		</footer>
 	</article>
 	<hr>

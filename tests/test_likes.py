@@ -7,7 +7,6 @@ def test_get_likes_for_post(app):
     with app.app_context():
         user_id = 2
         users_liking_post = get_users_liking_post(post_id=1)
-        print(users_liking_post)
         assert user_id in users_liking_post
 
         db = get_db()
@@ -17,7 +16,6 @@ def test_get_likes_for_post(app):
         )
         db.commit()
         users_liking_post = get_users_liking_post(post_id=1)
-        print(users_liking_post)
         assert 1 in users_liking_post
 
 
@@ -27,11 +25,11 @@ def test_create(client, auth, app):
     with app.app_context():
         db = get_db()
         likes_before = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+            "SELECT COUNT(id) FROM like WHERE post_id = 1").fetchone()[0]
         response = client.post("/likes/create", data={"post_id": 1})
         assert response.headers["Location"] == "http://localhost/1/detail"
         likes_after = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+            "SELECT COUNT(id) FROM like WHERE post_id = 1").fetchone()[0]
         assert likes_after == likes_before + 1
 
 
@@ -42,7 +40,7 @@ def test_no_double_like(client, auth, app):
         db = get_db()
         # Making sure that there is already a like by the user for the post
         like_count = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1 AND user_id = 2"
+            "SELECT COUNT(id) FROM like WHERE post_id = 1 AND user_id = 2"
         ).fetchone()[0]
         assert like_count == 1
 
@@ -56,11 +54,11 @@ def test_delete(client, auth, app):
     with app.app_context():
         db = get_db()
         likes_before = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+            "SELECT COUNT(id) FROM like WHERE post_id = 1").fetchone()[0]
         response = client.post("/likes/delete", data={"post_id": 1})
         assert response.headers["Location"] == "http://localhost/1/detail"
         likes_after = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1").fetchone()[0]
+            "SELECT COUNT(id) FROM like WHERE post_id = 1").fetchone()[0]
         assert likes_after == likes_before - 1
 
 
@@ -73,7 +71,7 @@ def test_logged_in_user_sees_like_link(client, auth, app):
         db = get_db()
         # Making sure that there is no like by the user for the post
         like_count = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1 AND user_id = 1"
+            "SELECT COUNT(id) FROM like WHERE post_id = 1 AND user_id = 1"
         ).fetchone()[0]
         assert like_count == 0
 
@@ -87,7 +85,7 @@ def test_logged_in_user_sees_like_link(client, auth, app):
         db = get_db()
         # Making sure that there is a like by the user for the post
         like_count = db.execute(
-            "SELECT COUNT(post_id) FROM like WHERE post_id = 1 AND user_id = 2"
+            "SELECT COUNT(id) FROM like WHERE post_id = 1 AND user_id = 2"
         ).fetchone()[0]
         assert like_count == 1
     auth.login(username="other", password="other")

@@ -15,7 +15,7 @@ def get_users_liking_post(post_id):
         "SELECT post_id, user_id FROM like WHERE post_id = ?",
         (post_id,)
     ).fetchall()
-    user_ids = [like[1] for like in likes]
+    user_ids = [like["user_id"] for like in likes]
     return user_ids
 
 

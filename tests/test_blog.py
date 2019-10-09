@@ -1,6 +1,7 @@
 import pytest
 
 from flaskr.db import get_db
+from flaskr.blog import create_post
 
 
 def test_index(client, auth):
@@ -86,6 +87,15 @@ def test_create(client, auth, app):
         db = get_db()
         count = db.execute("SELECT COUNT(id) FROM post").fetchone()[0]
         assert count == 2
+
+
+def test_create_post(auth, app):
+    with app.app_context():
+        db = get_db()
+        assert db.execute("SELECT COUNT(id) FROM post").fetchone()[0] == 1
+        post_id = create_post(title="A title", body="Some text.", author_id=1)
+        assert db.execute("SELECT COUNT(id) FROM post").fetchone()[0] == 2
+        assert post_id == 2
 
 
 def test_update(client, auth, app):

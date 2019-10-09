@@ -45,4 +45,7 @@ def create_app(test_config=None):
     from . import likes
     app.register_blueprint(likes.bp)
 
+    from . import tags
+    app.register_blueprint(tags.bp)
+
     return app

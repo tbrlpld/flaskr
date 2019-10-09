@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% from "tags/tags.html" import display_tag_string %}
 
 {% block header %}
-	<h1>{% block title%}Posts{% endblock %}</h1>
+	<h1>{% block title%}Posts{% endblock %}{% if tag %} with Tag: {{ tag }}{% endif %}</h1>
 	{% if g.user %}
 		<a class="action" href="{{ url_for('blog.create') }}">New</a>
 	{% endif %}
@@ -20,6 +21,11 @@
 				{% endif %}
 			</header>
 			<p class="body">{{ post['body'] }}</p>
+			<footer>
+				{% if post['tag_string'] %}
+					{{ display_tag_string(tag_string=post['tag_string']) }}
+				{% endif %}
+			</footer>
 		</article>
 		{% if not loop.last %}
 			<hr>
