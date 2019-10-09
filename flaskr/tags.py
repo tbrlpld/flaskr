@@ -14,15 +14,18 @@ def get_or_create_tag(name):
     """
     db = get_db()
     # Create the tag or ignore if it exists
-    db.execute(
-        "INSERT OR IGNORE INTO tag (name) VALUES (?)", (name,)
-    )
+    name = name.strip()
+    if name:
+        db.execute("INSERT OR IGNORE INTO tag (name) VALUES (?)", (name,))
+        db.commit()
     # Grab the id of the tag
     tag_id = db.execute(
         "SELECT (id) FROM tag WHERE name = ?", (name,)
-    ).fetchone()["id"]
-    db.commit()
-    return tag_id
+    ).fetchone()
+    if tag_id:
+        return tag_id["id"]
+    else:
+        return None
 
 
 def get_or_create_tags_from_string(tag_string):
@@ -41,7 +44,7 @@ def get_or_create_tags_from_string(tag_string):
     :rtype: tuple
     """
     tag_names = tag_string.split(" ")
-    return tuple([get_or_create_tag(t) for t in tag_names])
+    return tuple([get_or_create_tag(t) for t in tag_names if t])
 
 
 def get_tags_for_post(post_id):
@@ -93,3 +96,25 @@ def remove_tag_associations_for_post(post_id):
         "DELETE FROM post_tag WHERE post_id = ?", (post_id,)
     )
     db.commit()
+
+
+def update_tag_associations_for_post(tag_string, post_id):
+    """
+    Update tag associations for a post.
+
+    Tags are given as space separated words in a string. If a tag does not
+    exist in the DB it is created first.
+
+    Associations in the DB with tags that are not contained in the `tag_string`
+    are removed. This allows to delete all tag association by passing an empty
+    string as the `tag_string`.
+
+    :param tag_string: String containing the tags to be associated with the
+                       post.
+    :type str:
+
+    :param post_id: Id of the post the tags shall be associated with.
+    :type post_id: int
+    """
+    pass
+

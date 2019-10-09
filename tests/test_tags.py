@@ -4,7 +4,8 @@ from flaskr.db import get_db
 from flaskr.tags import (
     get_or_create_tag, get_or_create_tags_from_string,
     get_tags_for_post, associate_tag_with_post,
-    remove_tag_associations_for_post
+    remove_tag_associations_for_post,
+    update_tag_associations_for_post
 )
 
 
@@ -16,6 +17,12 @@ def test_get_or_create_tag(app):
         assert tag_id == 1
         tags_in_db = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
         assert tags_in_db == 1
+
+        tag_id = get_or_create_tag("")
+        assert tag_id == None
+
+        tag_id = get_or_create_tag(" ")
+        assert tag_id == None
 
         tag_id = get_or_create_tag("newtag")
         assert tag_id != 1
@@ -35,6 +42,14 @@ def test_get_or_create_tag_from_string(app):
         tag_count = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
         assert tag_count == 1
 
+        # Passing an empty string should return an empty tuple
+        tag_ids = get_or_create_tags_from_string("")
+        assert tag_ids == tuple()
+
+        # Passing a string with only whitespace should return an empty tuple
+        tag_ids = get_or_create_tags_from_string(" ")
+        assert tag_ids == tuple()
+
         tag_ids = get_or_create_tags_from_string("testtag newtag anothertag")
 
         tag_count = db.execute("SELECT COUNT(id) FROM tag").fetchone()[0]
@@ -45,6 +60,7 @@ def test_get_or_create_tag_from_string(app):
         assert "testtag" in tags
         assert "newtag" in tags
         assert "anothertag" in tags
+
 
 
 def test_associate_tag_with_post(app):
@@ -65,6 +81,25 @@ def test_remove_tag_associations_for_post(app):
         tags = get_tags_for_post(post_id=1)
         assert "testtag" not in tags
         assert tags == []
+
+
+def test_update_tag_associations_for_post(app):
+    """
+    Updating the tag associations for a post can be used as a convenience
+    function, which takes care of adding new tags associations and deletes
+    removed tag associations.
+
+    If a tag does not exist before, it is created.
+    """
+    with app.app_context():
+        tags = get_tags_for_post(post_id=1)
+        assert tags == ["testtag"]
+
+        update_tag_associations_for_post(
+            tag_string="testtag newtag", post_id=1)
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" in tags
+        assert "newtag" in tags
 
 
 def test_deleting_post_removes_tag_associations(client, auth, app):
