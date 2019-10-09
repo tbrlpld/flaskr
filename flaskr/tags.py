@@ -9,23 +9,21 @@ def get_or_create_tag(name):
     :param name: Name or word that the tag is made of
     :type name: string
 
-    :returns: Id of the tag created in the database
-    :rtype: int
+    :returns: Id of the tag created in the database or None if id not found.
+    :rtype: int or None
     """
     db = get_db()
-    # Create the tag or ignore if it exists
     name = name.strip()
     if name:
+        # Create the tag or ignore if it exists
         db.execute("INSERT OR IGNORE INTO tag (name) VALUES (?)", (name,))
         db.commit()
-    # Grab the id of the tag
-    tag_id = db.execute(
-        "SELECT (id) FROM tag WHERE name = ?", (name,)
-    ).fetchone()
-    if tag_id:
-        return tag_id["id"]
-    else:
-        return None
+        # Grab the id of the tag
+        tag_id = db.execute(
+            "SELECT (id) FROM tag WHERE name = ?", (name,)
+        ).fetchone()["id"]
+        return tag_id
+    return None
 
 
 def get_or_create_tags_from_string(tag_string):
@@ -44,7 +42,7 @@ def get_or_create_tags_from_string(tag_string):
     :rtype: tuple
     """
     tag_names = tag_string.split(" ")
-    return tuple([get_or_create_tag(t) for t in tag_names if t])
+    return tuple([get_or_create_tag(t) for t in tag_names if t.strip()])
 
 
 def get_tags_for_post(post_id):
@@ -111,10 +109,13 @@ def update_tag_associations_for_post(tag_string, post_id):
 
     :param tag_string: String containing the tags to be associated with the
                        post.
-    :type str:
+    :type tag_string: str
 
     :param post_id: Id of the post the tags shall be associated with.
     :type post_id: int
     """
-    pass
+    tag_ids = get_or_create_tags_from_string(tag_string)
+    for tag_id in tag_ids:
+        associate_tag_with_post(tag_id=tag_id, post_id=post_id)
+
 

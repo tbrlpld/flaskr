@@ -35,7 +35,7 @@ def test_get_or_create_tag(app):
         assert "newtag" in tags
 
 
-def test_get_or_create_tag_from_string(app):
+def test_get_or_create_tags_from_string(app):
     with app.app_context():
         db = get_db()
 
@@ -60,7 +60,6 @@ def test_get_or_create_tag_from_string(app):
         assert "testtag" in tags
         assert "newtag" in tags
         assert "anothertag" in tags
-
 
 
 def test_associate_tag_with_post(app):
