@@ -67,7 +67,7 @@ def test_remove_tag_associations_for_post(app):
         assert tags == []
 
 
-def test_deleting_post_removed_tag_associations(client, auth, app):
+def test_deleting_post_removes_tag_associations(client, auth, app):
     auth.login()
     with app.test_request_context():
         tags = get_tags_for_post(post_id=1)
@@ -182,9 +182,9 @@ def test_tags_shown_on_detail(client, auth, app):
 
 def test_post_without_tags_shown_on_index(client, auth, app):
     """
-    When the solution to add the tags to the post object was added, to the
-    SQL statement to retrieve the post, this broke something so that no posts
-    without tags would be retrievable anymore!
+    When the solution to add the tags to the post object was added to the
+    SQL statement which retrieves the post, this broke something so that no
+    posts without tags would be retrievable anymore!
     This test is to check the functionality of not tagged posts.
     """
     auth.login()
@@ -200,9 +200,9 @@ def test_post_without_tags_shown_on_index(client, auth, app):
 
 def test_detail_of_post_without_tag_still_works(client, auth, app):
     """
-    When the solution to add the tags to the post object was added, to the
-    SQL statement to retrieve the post, this broke something so that no posts
-    without tags would be retrievable anymore!
+    When the solution to add the tags to the post object was added to the
+    SQL statement which retrieves the post, this broke something so that no
+    posts without tags would be retrievable anymore!
     This test is to check the functionality of not tagged posts.
     """
     auth.login()
