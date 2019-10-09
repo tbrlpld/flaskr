@@ -94,11 +94,27 @@ def test_update_tag_associations_for_post(app):
         tags = get_tags_for_post(post_id=1)
         assert tags == ["testtag"]
 
+        # Adding association
         update_tag_associations_for_post(
             tag_string="testtag newtag", post_id=1)
         tags = get_tags_for_post(post_id=1)
         assert "testtag" in tags
         assert "newtag" in tags
+
+        # Removing association
+        update_tag_associations_for_post(
+            tag_string="newtag", post_id=1)
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" not in tags
+        assert "newtag" in tags
+
+        # Delete all associations with empty string
+        update_tag_associations_for_post(
+            tag_string="", post_id=1)
+        tags = get_tags_for_post(post_id=1)
+        assert "testtag" not in tags
+        assert "newtag" not in tags
+        assert tags == tuple()
 
 
 def test_deleting_post_removes_tag_associations(client, auth, app):
