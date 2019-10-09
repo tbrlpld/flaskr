@@ -82,6 +82,24 @@ def associate_tag_with_post(tag_id, post_id):
     db.commit()
 
 
+def disassociate_tag_from_post(tag_id, post_id):
+    """
+    Remove an association/relationship between a given tag id and post id.
+
+    :param tag_id: Id of the tag which shall be disassociated from the post.
+    :type tag_id: int
+
+    :param post_id: Id of the post from which the tag shall be disassociated.
+    :type post_id: int
+    """
+    db = get_db()
+    db.execute(
+        "DELETE FROM post_tag WHERE post_id = ? AND tag_id = ?",
+        (post_id, tag_id)
+    )
+    db.commit()
+
+
 def remove_tag_associations_for_post(post_id):
     """
     Remove all tag association for a post.
@@ -90,9 +108,7 @@ def remove_tag_associations_for_post(post_id):
     :type post_id: int
     """
     db = get_db()
-    db.execute(
-        "DELETE FROM post_tag WHERE post_id = ?", (post_id,)
-    )
+    db.execute("DELETE FROM post_tag WHERE post_id = ?", (post_id,))
     db.commit()
 
 
@@ -114,7 +130,18 @@ def update_tag_associations_for_post(tag_string, post_id):
     :param post_id: Id of the post the tags shall be associated with.
     :type post_id: int
     """
-    remove_tag_associations_for_post(post_id=post_id)
-    tag_ids = get_or_create_tags_from_string(tag_string)
-    for tag_id in tag_ids:
+    current_associated_tags = get_tags_for_post(post_id)
+    desired_associated_tags = tag_string.strip().split()
+
+    tags_to_add = [tag for tag in desired_associated_tags
+                   if tag not in current_associated_tags]
+    tags_to_remove = [tag for tag in current_associated_tags
+                      if tag not in desired_associated_tags]
+
+    for tag in tags_to_add:
+        tag_id = get_or_create_tag(tag)
         associate_tag_with_post(tag_id=tag_id, post_id=post_id)
+
+    for tag in tags_to_remove:
+        tag_id = get_or_create_tag(tag)
+        disassociate_tag_from_post(tag_id=tag_id, post_id=post_id)

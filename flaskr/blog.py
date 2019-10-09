@@ -152,5 +152,5 @@ def delete(id):
     db = get_db()
     db.execute("DELETE FROM post WHERE id = ?", (id, ))
     db.commit()
-    remove_tag_associations_for_post(post_id=id)
+    update_tag_associations_for_post(tag_string="", post_id=id)
     return redirect(url_for("blog.index"))
