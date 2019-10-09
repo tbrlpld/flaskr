@@ -140,6 +140,16 @@ def test_display_of_tagged_posts(client, app):
         assert b"other" not in response.data
 
 
+def test_link_to_tagged_posts(client, app):
+    with app.test_request_context():
+        response = client.get(
+            url_for("index", tag="testtag"))
+        assert b"test title" in response.data
+        assert b"testtag" in response.data
+        assert bytes(url_for("tags.display_tagged_posts", tag="testtag"),
+                     encoding="utf8") in response.data
+
+
 def test_deleting_post_removes_tag_associations(client, auth, app):
     auth.login()
     with app.test_request_context():

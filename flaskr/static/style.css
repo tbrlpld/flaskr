@@ -70,4 +70,8 @@ input[type=submit] { align-self: start; min-width: 10em; }
 	color: white;
 	padding: 0.2rem;
 	border-radius: 0.2rem;
+	text-decoration: none;
+}
+.tag-link {
+	text-decoration: none;
 }
