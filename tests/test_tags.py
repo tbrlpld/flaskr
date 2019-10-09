@@ -132,6 +132,14 @@ def test_update_tag_associations_for_post(app):
         assert tags == []
 
 
+def test_display_of_tagged_posts(client, app):
+    with app.test_request_context():
+        response = client.get(
+            url_for("tags.display_tagged_posts", tag="testtag"))
+        assert b"test title" in response.data
+        assert b"other" not in response.data
+
+
 def test_deleting_post_removes_tag_associations(client, auth, app):
     auth.login()
     with app.test_request_context():

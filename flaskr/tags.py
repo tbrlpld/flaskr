@@ -1,5 +1,9 @@
+from flask import Blueprint, render_template
 
 from flaskr.db import get_db
+
+
+bp = Blueprint("tags", __name__, url_prefix="/tags")
 
 
 def get_or_create_tag(name):
@@ -145,3 +149,20 @@ def update_tag_associations_for_post(tag_string, post_id):
     for tag in tags_to_remove:
         tag_id = get_or_create_tag(tag)
         disassociate_tag_from_post(tag_id=tag_id, post_id=post_id)
+
+
+@bp.route("/<string:tag>")
+def display_tagged_posts(tag):
+    db = get_db()
+    posts = db.execute(
+        "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username"
+        # " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        " FROM post p"
+        " JOIN user u ON p.author_id = u.id"
+        " JOIN post_tag pt ON p.id = pt.post_id"
+        " JOIN tag t ON pt.tag_id = t.id"
+        " WHERE t.name = ?"
+        " ORDER BY p.created DESC",
+        (tag,)
+    ).fetchall()
+    return render_template("blog/index.html", posts=posts, tag=tag)
