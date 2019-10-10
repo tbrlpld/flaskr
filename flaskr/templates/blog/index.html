@@ -2,7 +2,7 @@
 {% from "tags/tags.html" import display_tag_string %}
 
 {% block header %}
-	<h1>{% block title%}Posts{% endblock %}{% if tag %} with Tag: {{ tag }}{% endif %}</h1>
+	<h1>{% block title%}Posts{% endblock %}{% if tag %} with Tag "{{ tag }}"{% endif %}{% if search %} for Search Query "{{ search }}"{% endif %}</h1>
 	{% if g.user %}
 		<a class="action" href="{{ url_for('blog.create') }}">New</a>
 	{% endif %}

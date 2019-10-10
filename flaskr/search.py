@@ -23,4 +23,4 @@ def display_search_filtered_index():
         " ORDER BY p.created DESC",
         ("%" + query + "%",)
     ).fetchall()
-    return render_template("blog/index.html", posts=posts)
+    return render_template("blog/index.html", posts=posts, search=query)

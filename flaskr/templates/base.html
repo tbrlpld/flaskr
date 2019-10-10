@@ -4,7 +4,7 @@
 <nav>
 	<h1><a href="{{ url_for('index') }}">Flaskr</a></h1>
 	<form action="{{ url_for('search.display_search_filtered_index') }}">
-		<input type="text" name="q" placeholder="Search">
+		<input type="text" name="q" placeholder="Search" value="{{ request.args['q'] or '' }}">
 	</form>
 	<ul>
 		{% if g.user %}
