@@ -3,6 +3,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
 	<h1><a href="{{ url_for('index') }}">Flaskr</a></h1>
+	<form action="{{ url_for('search.display_search_filtered_index') }}">
+		<input type="text" name="q" placeholder="Search">
+	</form>
 	<ul>
 		{% if g.user %}
 			<li><span>{{ g.user['username'] }}</span></li>

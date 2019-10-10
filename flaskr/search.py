@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, request, render_template
 
 from flaskr.db import get_db
 
@@ -6,8 +6,9 @@ from flaskr.db import get_db
 bp = Blueprint("search", __name__, url_prefix="/search")
 
 
-@bp.route("<string:title>")
-def display_search_filtered_index(title):
+@bp.route("/")
+def display_search_filtered_index():
+    query = request.args["q"]
     db = get_db()
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
@@ -20,6 +21,6 @@ def display_search_filtered_index(title):
         " WHERE p.title LIKE ?"
         " GROUP BY p.id"
         " ORDER BY p.created DESC",
-        ("%" + title + "%",)
+        ("%" + query + "%",)
     ).fetchall()
     return render_template("blog/index.html", posts=posts)
