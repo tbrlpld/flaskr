@@ -1,6 +1,7 @@
 import pytest
 
 from flaskr.blog import create_post, update_post
+from flaskr.pagination import Pagination
 
 
 @pytest.fixture
@@ -91,3 +92,18 @@ def test_pagination_on_third_index_page(numbered_posts, client):
     assert b"paged title 03" in response.data
     assert b"paged title 02" in response.data
     assert b"paged title 01" in response.data
+
+
+@pytest.mark.parametrize(
+    ("page", "has_previous_expected"), (
+        (1, False),
+        (2, True),
+        (3, True),
+    ))
+def test_pagination_object_has_previous(page, has_previous_expected):
+    pagination = Pagination(
+        total_items=20,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.has_previous == has_previous_expected
