@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for,
+    current_app
 )
 from werkzeug.exceptions import abort
 
@@ -38,7 +39,6 @@ def get_post(id, check_author=True):
 @bp.route("/")
 def index():
     page = int(request.args.get("page", default="1"))
-    posts_per_page = 5
     db = get_db()
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
@@ -50,7 +50,8 @@ def index():
         " LEFT JOIN tag t ON pt.tag_id = t.id"
         " GROUP BY p.id"
         " ORDER BY p.id DESC"
-        " LIMIT ? OFFSET ?", (posts_per_page, (page - 1) * 5,)
+        " LIMIT ? OFFSET ?",
+        (current_app.config["POSTS_PER_PAGE"], (page - 1) * 5)
     ).fetchall()
     return render_template("blog/index.html", posts=posts)
 
