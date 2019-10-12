@@ -170,3 +170,19 @@ def test_pagination_object_next_property(page, next_expected):
         current_page=page
     )
     assert pagination.next == next_expected
+
+
+@pytest.mark.parametrize(
+    ("page", "items_per_page", "item_offset_expected"), (
+        (1, 5, 0),
+        (2, 5, 5),
+        (3, 3, 6),
+    ))
+def test_pagination_object_next_property(
+        page, items_per_page, item_offset_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=items_per_page,
+        current_page=page
+    )
+    assert pagination.item_offset == item_offset_expected
