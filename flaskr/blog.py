@@ -37,6 +37,8 @@ def get_post(id, check_author=True):
 
 @bp.route("/")
 def index():
+    page = int(request.args.get("page", default="1"))
+    posts_per_page = 5
     db = get_db()
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
@@ -47,7 +49,8 @@ def index():
         " LEFT JOIN post_tag pt ON p.id = pt.post_id"
         " LEFT JOIN tag t ON pt.tag_id = t.id"
         " GROUP BY p.id"
-        " ORDER BY p.created DESC"
+        " ORDER BY p.id DESC"
+        " LIMIT ? OFFSET ?", (posts_per_page, (page - 1) * 5,)
     ).fetchall()
     return render_template("blog/index.html", posts=posts)
 
