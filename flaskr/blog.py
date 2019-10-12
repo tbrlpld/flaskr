@@ -53,6 +53,8 @@ def index():
         " LIMIT ? OFFSET ?",
         (current_app.config["POSTS_PER_PAGE"], (page - 1) * 5)
     ).fetchall()
+    for post in posts:
+        print(tuple(post))
     return render_template("blog/index.html", posts=posts)
 
 
