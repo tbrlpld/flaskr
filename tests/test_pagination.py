@@ -95,15 +95,78 @@ def test_pagination_on_third_index_page(numbered_posts, client):
 
 
 @pytest.mark.parametrize(
+    ("total_items", "items_per_page", "total_pages_expected"), (
+        (12, 5, 3),
+        (50, 10, 5),
+        (51, 10, 6),
+    ))
+def test_pagination_object_total_pages_property(
+        total_items,
+        items_per_page,
+        total_pages_expected):
+    pagination = Pagination(
+        total_items=total_items,
+        items_per_page=items_per_page,
+        current_page=1
+    )
+    assert pagination.total_pages == total_pages_expected
+
+
+@pytest.mark.parametrize(
     ("page", "has_previous_expected"), (
         (1, False),
         (2, True),
         (3, True),
     ))
-def test_pagination_object_has_previous(page, has_previous_expected):
+def test_pagination_object_has_previous_property(page, has_previous_expected):
     pagination = Pagination(
-        total_items=20,
+        total_items=15,
         items_per_page=5,
         current_page=page
     )
     assert pagination.has_previous == has_previous_expected
+
+
+@pytest.mark.parametrize(
+    ("page", "previous_expected"), (
+        (1, None),
+        (2, 1),
+        (3, 2),
+    ))
+def test_pagination_object_previous_property(page, previous_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.previous == previous_expected
+
+
+@pytest.mark.parametrize(
+    ("page", "has_next_expected"), (
+        (1, True),
+        (2, True),
+        (3, False),
+    ))
+def test_pagination_object_has_next_property(page, has_next_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.has_next == has_next_expected
+
+
+@pytest.mark.parametrize(
+    ("page", "next_expected"), (
+        (1, 2),
+        (2, 3),
+        (3, None),
+    ))
+def test_pagination_object_next_property(page, next_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.next == next_expected
