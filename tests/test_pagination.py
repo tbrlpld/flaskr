@@ -275,3 +275,17 @@ def test_pagination_links_on_index_pages(numbered_posts, client):
     response = client.get("/?page=3")
     assert b"/?page=2" in response.data
     assert b"/?page=4" not in response.data
+
+
+def test_pagination_links_on_search_result_index_page(numbered_posts, client):
+    response = client.get("/search/?q=paged&page=1")
+    assert b"/search/?q=paged&page=0" not in response.data
+    assert b"/search/?q=paged&page=2" in response.data
+
+    response = client.get("/search/?q=paged&page=2")
+    assert b"/search/?q=paged&page=1" in response.data
+    assert b"/search/?q=paged&page=3" in response.data
+
+    response = client.get("/search/?q=paged&page=3")
+    assert b"/search/?q=paged&page=2" in response.data
+    assert b"/search/?q=paged&page=4" not in response.data

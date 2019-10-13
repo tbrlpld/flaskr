@@ -33,6 +33,16 @@
 		{% endif %}
 	{% endfor %}
 	{% if pagination %}
-		{{ display_pagination(base_url=url_for("index"), pagination=pagination) }}
+		{% if search %}
+			{{ display_pagination(
+				base_url=url_for("search.display_search_filtered_index", q=search), 
+				pagination=pagination,
+				querystring_connector="&") 
+			}}
+		{% else %}
+			{{ display_pagination(
+				base_url=(url_for("index")), 
+				pagination=pagination) }}
+		{% endif %}
 	{% endif %}
 {% endblock %}
