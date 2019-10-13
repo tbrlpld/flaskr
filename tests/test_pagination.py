@@ -182,6 +182,36 @@ def test_pagination_object_next_property(page, next_expected):
 
 
 @pytest.mark.parametrize(
+    ("page", "is_first_expected"), (
+        (1, True),
+        (2, False),
+        (3, False),
+    ))
+def test_pagination_object_next_property(page, is_first_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.is_first == is_first_expected
+
+
+@pytest.mark.parametrize(
+    ("page", "is_last_expected"), (
+        (1, False),
+        (2, False),
+        (3, True),
+    ))
+def test_pagination_object_next_property(page, is_last_expected):
+    pagination = Pagination(
+        total_items=15,
+        items_per_page=5,
+        current_page=page
+    )
+    assert pagination.is_first == is_last_expected
+
+
+@pytest.mark.parametrize(
     ("page", "items_per_page", "item_offset_expected"), (
         (1, 5, 0),
         (2, 5, 5),
@@ -195,3 +225,17 @@ def test_pagination_object_next_property(
         current_page=page
     )
     assert pagination.item_offset == item_offset_expected
+
+
+# def test_pagination_displayed_on_index_pages(numbered_posts, client):
+#     response = client.get("/?page=1")
+#     assert b"/?page=0" not in response.data
+#     assert b"/?page=2" in response.data
+
+#     response = client.get("/?page=2")
+#     assert b"/?page=1" in response.data
+#     assert b"/?page=3" in response.data
+
+#     response = client.get("/?page=3")
+#     assert b"/?page=2" in response.data
+#     assert b"/?page=4" not in response.data
