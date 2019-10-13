@@ -75,3 +75,6 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .tag-link {
 	text-decoration: none;
 }
+.pagination {
+	margin: 1rem 0;
+}

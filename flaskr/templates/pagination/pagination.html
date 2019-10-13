@@ -1,0 +1,16 @@
+{%- macro display_pagination(base_url, pagination, querystring_connector="?") %}
+	<div class="pagination">
+		{% if not pagination.is_first %}
+			<a href="{{ base_url }}{{ querystring_connector|safe }}page={{ pagination.first }}">&lt;&lt; First</a>
+		{% endif %}
+		{% if pagination.has_previous %}
+			<a href="{{ base_url }}{{ querystring_connector|safe }}page={{ pagination.previous }}">&lt; Previous</a>
+		{% endif %}
+		{% if pagination.has_next %}
+			<a href="{{ base_url }}{{ querystring_connector|safe }}page={{ pagination.next }}">Next &gt;</a>
+		{% endif %}
+		{% if not pagination.is_last %}
+			<a href="{{ base_url }}{{ querystring_connector|safe }}page={{ pagination.last }}">Last &gt;&gt;</a>
+		{% endif %}
+	</div>
+{% endmacro -%}

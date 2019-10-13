@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for,
+    current_app
 )
 from werkzeug.exceptions import abort
 
@@ -7,6 +8,7 @@ from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
+from flaskr.pagination import Pagination
 from flaskr.tags import update_tag_associations_for_post
 
 bp = Blueprint("blog", __name__)
@@ -38,6 +40,12 @@ def get_post(id, check_author=True):
 @bp.route("/")
 def index():
     db = get_db()
+    post_count = db.execute("SELECT COUNT() FROM post").fetchone()[0]
+    page = int(request.args.get("page", default="1"))
+    pagination = Pagination(
+        total_items=post_count,
+        items_per_page=current_app.config["POSTS_PER_PAGE"],
+        current_page=page)
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
         " GROUP_CONCAT(t.name, ' ') AS tag_string"
@@ -47,9 +55,12 @@ def index():
         " LEFT JOIN post_tag pt ON p.id = pt.post_id"
         " LEFT JOIN tag t ON pt.tag_id = t.id"
         " GROUP BY p.id"
-        " ORDER BY p.created DESC"
+        " ORDER BY p.id DESC"
+        " LIMIT ? OFFSET ?",
+        (pagination.items_per_page, pagination.item_offset)
     ).fetchall()
-    return render_template("blog/index.html", posts=posts)
+    return render_template(
+        "blog/index.html", posts=posts, pagination=pagination)
 
 
 @bp.route("/<int:id>/detail", methods=("GET",))

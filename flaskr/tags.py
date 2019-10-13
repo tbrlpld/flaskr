@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app, request
 
 from flaskr.db import get_db
+from flaskr.pagination import Pagination
 
 
 bp = Blueprint("tags", __name__, url_prefix="/tags")
@@ -154,6 +155,20 @@ def update_tag_associations_for_post(tag_string, post_id):
 @bp.route("/<string:tag>")
 def display_tagged_posts(tag):
     db = get_db()
+    page = int(request.args.get("page", default="1"))
+    post_count = db.execute(
+        "SELECT COUNT()"
+        " FROM post p"
+        " JOIN user u ON p.author_id = u.id"
+        " JOIN post_tag pt ON p.id = pt.post_id"
+        " JOIN tag t ON pt.tag_id = t.id"
+        " WHERE t.name = ?",
+        (tag,)
+    ).fetchone()[0]
+    pagination = Pagination(
+        total_items=post_count,
+        items_per_page=current_app.config["POSTS_PER_PAGE"],
+        current_page=page)
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username"
         # " GROUP_CONCAT(t.name, ' ') AS tag_string"
@@ -162,7 +177,9 @@ def display_tagged_posts(tag):
         " JOIN post_tag pt ON p.id = pt.post_id"
         " JOIN tag t ON pt.tag_id = t.id"
         " WHERE t.name = ?"
-        " ORDER BY p.created DESC",
-        (tag,)
+        " ORDER BY p.created DESC"
+        " LIMIT ? OFFSET ?",
+        (tag, pagination.items_per_page, pagination.item_offset)
     ).fetchall()
-    return render_template("blog/index.html", posts=posts, tag=tag)
+    return render_template(
+        "blog/index.html", posts=posts, tag=tag, pagination=pagination)
