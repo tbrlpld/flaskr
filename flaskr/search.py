@@ -11,7 +11,16 @@ bp = Blueprint("search", __name__, url_prefix="/search")
 def display_search_filtered_index():
     query = request.args["q"]
     db = get_db()
-    post_count = db.execute("SELECT COUNT() FROM post").fetchone()[0]
+    post_count = db.execute(
+        "SELECT COUNT()"
+        " FROM post p"
+        " JOIN user u ON p.author_id = u.id"
+        # LEFT JOIN makes the existence of values in the right table optional!
+        " LEFT JOIN post_tag pt ON p.id = pt.post_id"
+        " LEFT JOIN tag t ON pt.tag_id = t.id"
+        " WHERE p.title LIKE ?",
+        ("%" + query + "%",)
+    ).fetchone()[0]
     page = int(request.args.get("page", default="1"))
     pagination = Pagination(
         total_items=post_count,

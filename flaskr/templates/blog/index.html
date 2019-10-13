@@ -39,6 +39,11 @@
 				pagination=pagination,
 				querystring_connector="&") 
 			}}
+		{% elif tag %}
+			{{ display_pagination(
+				base_url=url_for("tags.display_tagged_posts", tag=tag), 
+				pagination=pagination) 
+			}}
 		{% else %}
 			{{ display_pagination(
 				base_url=(url_for("index")), 

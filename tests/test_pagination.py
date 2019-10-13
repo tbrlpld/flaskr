@@ -1,7 +1,9 @@
 import pytest
 
 from flaskr.blog import create_post, update_post
+from flaskr.db import get_db
 from flaskr.pagination import Pagination
+from flaskr.tags import associate_tag_with_post, get_or_create_tag
 
 
 @pytest.fixture
@@ -289,3 +291,27 @@ def test_pagination_links_on_search_result_index_page(numbered_posts, client):
     response = client.get("/search/?q=paged&page=3")
     assert b"/search/?q=paged&page=2" in response.data
     assert b"/search/?q=paged&page=4" not in response.data
+
+
+def test_pagination_links_on_tagged_result_index_page(
+        numbered_posts, client, app):
+    with app.app_context():
+        db = get_db()
+        tag_id = get_or_create_tag("newtag")
+        posts = db.execute("SELECT id FROM post").fetchall()
+        for post in posts:
+            # print(f"Creating tag for post: {post['id']}")
+            associate_tag_with_post(post_id=post["id"], tag_id=tag_id)
+
+    response = client.get("/tags/newtag?page=1")
+    # print(response.data)
+    assert b"/tags/newtag?page=0" not in response.data
+    assert b"/tags/newtag?page=2" in response.data
+
+    response = client.get("/tags/newtag?page=2")
+    assert b"/tags/newtag?page=1" in response.data
+    assert b"/tags/newtag?page=3" in response.data
+
+    response = client.get("/tags/newtag?page=3")
+    assert b"/tags/newtag?page=2" in response.data
+    assert b"/tags/newtag?page=4" not in response.data
