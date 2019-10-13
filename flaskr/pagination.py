@@ -11,9 +11,6 @@ class Pagination(object):
         Pagination needs info about total number of items, items_per_page and
         the current page for initialization.
 
-        If the `items_per_page` argument is not defined, the `ITEMS_PER_PAGE`
-        setting is read from the current apps configuration.
-
         :param total_items: Total number of items which are being paginated.
         :type total_item: int
 
@@ -31,28 +28,44 @@ class Pagination(object):
 
     @property
     def total_pages(self):
+        """Return total number or pages"""
         return ceil(self.total_items / self.items_per_page)
 
     @property
     def has_previous(self):
+        """Check if the current page has a previous page"""
         return self.current_page > 1
 
     @property
     def previous(self):
+        """Return page number of the previous page"""
         if self.has_previous:
             return self.current_page - 1
         return None
 
     @property
     def has_next(self):
+        """Check if the current page has a next page"""
         return self.current_page < self.total_pages
 
     @property
     def next(self):
+        """Return page number of the current page"""
         if self.has_next:
             return self.current_page + 1
         return None
 
     @property
     def item_offset(self):
+        """
+        Return offset for grabbing items
+
+        Depending on the current page, the items displayed do not start with
+        the first item in the item set. The number of items to skip in the set
+        is returned by this method.
+
+        The items are assumed to be indexed from 1. E.g. if the current page is
+        2 and there are 5 items per page, the first five should be skipped.
+        The returned offset in that case would be 5.
+        """
         return (self.current_page - 1) * self.items_per_page

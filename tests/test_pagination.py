@@ -157,6 +157,15 @@ def test_pagination_object_has_next_property(page, has_next_expected):
     assert pagination.has_next == has_next_expected
 
 
+def test_pagination_object_has_next_property_when_no_items():
+    pagination = Pagination(
+        total_items=0,
+        items_per_page=5,
+        current_page=1
+    )
+    assert pagination.has_next == False
+
+
 @pytest.mark.parametrize(
     ("page", "next_expected"), (
         (1, 2),

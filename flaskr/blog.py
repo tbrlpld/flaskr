@@ -8,6 +8,7 @@ from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
 from flaskr.likes import get_users_liking_post
+from flaskr.pagination import Pagination
 from flaskr.tags import update_tag_associations_for_post
 
 bp = Blueprint("blog", __name__)
@@ -38,8 +39,13 @@ def get_post(id, check_author=True):
 
 @bp.route("/")
 def index():
-    page = int(request.args.get("page", default="1"))
     db = get_db()
+    post_count = db.execute("SELECT COUNT() FROM post").fetchone()[0]
+    page = int(request.args.get("page", default="1"))
+    pagination = Pagination(
+        total_items=post_count,
+        items_per_page=current_app.config["POSTS_PER_PAGE"],
+        current_page=page)
     posts = db.execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
         " GROUP_CONCAT(t.name, ' ') AS tag_string"
@@ -51,10 +57,8 @@ def index():
         " GROUP BY p.id"
         " ORDER BY p.id DESC"
         " LIMIT ? OFFSET ?",
-        (current_app.config["POSTS_PER_PAGE"], (page - 1) * 5)
+        (pagination.items_per_page, pagination.item_offset)
     ).fetchall()
-    for post in posts:
-        print(tuple(post))
     return render_template("blog/index.html", posts=posts)
 
 
