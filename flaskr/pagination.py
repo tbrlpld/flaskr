@@ -49,6 +49,11 @@ class Pagination(object):
         return not(self.has_previous)
 
     @property
+    def first(self):
+        """Return first page of the pagination (which is always 1 ^^)"""
+        return 1
+
+    @property
     def has_next(self):
         """Check if the current page has a next page"""
         return self.current_page < self.total_pages
@@ -61,9 +66,14 @@ class Pagination(object):
         return None
 
     @property
-    def is_first(self):
+    def is_last(self):
         """Check if the current page is the last"""
         return not(self.has_next)
+
+    @property
+    def last(self):
+        """Return last page number of the pagination"""
+        return self.total_pages
 
     @property
     def item_offset(self):
