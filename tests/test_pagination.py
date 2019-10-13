@@ -163,7 +163,7 @@ def test_pagination_object_has_next_property_when_no_items():
         items_per_page=5,
         current_page=1
     )
-    assert pagination.has_next == False
+    assert pagination.has_next is False
 
 
 @pytest.mark.parametrize(
@@ -187,7 +187,7 @@ def test_pagination_object_next_property(page, next_expected):
         (2, False),
         (3, False),
     ))
-def test_pagination_object_next_property(page, is_first_expected):
+def test_pagination_object_is_first_property(page, is_first_expected):
     pagination = Pagination(
         total_items=15,
         items_per_page=5,
@@ -197,18 +197,54 @@ def test_pagination_object_next_property(page, is_first_expected):
 
 
 @pytest.mark.parametrize(
+    ("total_items", "items_per_page", "first_expected"), (
+        (12, 5, 1),
+        (50, 10, 1),
+        (51, 10, 1),
+    ))
+def test_pagination_object_first_property(
+        total_items,
+        items_per_page,
+        first_expected):
+    pagination = Pagination(
+        total_items=total_items,
+        items_per_page=items_per_page,
+        current_page=1
+    )
+    assert pagination.first == first_expected
+
+
+@pytest.mark.parametrize(
     ("page", "is_last_expected"), (
         (1, False),
         (2, False),
         (3, True),
     ))
-def test_pagination_object_next_property(page, is_last_expected):
+def test_pagination_object_is_last_property(page, is_last_expected):
     pagination = Pagination(
         total_items=15,
         items_per_page=5,
         current_page=page
     )
-    assert pagination.is_first == is_last_expected
+    assert pagination.is_last == is_last_expected
+
+
+@pytest.mark.parametrize(
+    ("total_items", "items_per_page", "last_expected"), (
+        (12, 5, 3),
+        (50, 10, 5),
+        (51, 10, 6),
+    ))
+def test_pagination_object_last_property(
+        total_items,
+        items_per_page,
+        last_expected):
+    pagination = Pagination(
+        total_items=total_items,
+        items_per_page=items_per_page,
+        current_page=1
+    )
+    assert pagination.last == last_expected
 
 
 @pytest.mark.parametrize(
