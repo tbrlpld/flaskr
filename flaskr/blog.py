@@ -59,7 +59,8 @@ def index():
         " LIMIT ? OFFSET ?",
         (pagination.items_per_page, pagination.item_offset)
     ).fetchall()
-    return render_template("blog/index.html", posts=posts)
+    return render_template(
+        "blog/index.html", posts=posts, pagination=pagination)
 
 
 @bp.route("/<int:id>/detail", methods=("GET",))

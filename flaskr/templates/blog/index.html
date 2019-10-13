@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% from "tags/tags.html" import display_tag_string %}
+{% from "pagination/pagination.html" import display_pagination %}
 
 {% block header %}
 	<h1>{% block title%}Posts{% endblock %}{% if tag %} with Tag "{{ tag }}"{% endif %}{% if search %} for Search Query "{{ search }}"{% endif %}</h1>
@@ -31,4 +32,7 @@
 			<hr>
 		{% endif %}
 	{% endfor %}
+	{% if pagination %}
+		{{ display_pagination(base_url=url_for("index"), pagination=pagination) }}
+	{% endif %}
 {% endblock %}

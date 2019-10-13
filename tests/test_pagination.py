@@ -31,7 +31,7 @@ def numbered_posts(app):
     "/",
     "/?page=1",
 ))
-def test_pagination_on_plain_index(numbered_posts, client, path):
+def test_pagination_of_posts_on_first_index_page(numbered_posts, client, path):
     response = client.get(path)
     assert b"paged title 15" in response.data
     assert b"paged title 14" in response.data
@@ -52,7 +52,7 @@ def test_pagination_on_plain_index(numbered_posts, client, path):
     assert b"paged title 01" not in response.data
 
 
-def test_pagination_on_second_index_page(numbered_posts, client):
+def test_pagination_of_posts_on_second_index_page(numbered_posts, client):
     response = client.get("/?page=2")
     assert b"paged title 15" not in response.data
     assert b"paged title 14" not in response.data
@@ -73,7 +73,7 @@ def test_pagination_on_second_index_page(numbered_posts, client):
     assert b"paged title 01" not in response.data
 
 
-def test_pagination_on_third_index_page(numbered_posts, client):
+def test_pagination_of_posts_on_third_index_page(numbered_posts, client):
     response = client.get("/?page=3")
     assert b"paged title 15" not in response.data
     assert b"paged title 14" not in response.data
@@ -253,7 +253,7 @@ def test_pagination_object_last_property(
         (2, 5, 5),
         (3, 3, 6),
     ))
-def test_pagination_object_next_property(
+def test_pagination_object_item_offset_property(
         page, items_per_page, item_offset_expected):
     pagination = Pagination(
         total_items=15,
@@ -263,15 +263,15 @@ def test_pagination_object_next_property(
     assert pagination.item_offset == item_offset_expected
 
 
-# def test_pagination_displayed_on_index_pages(numbered_posts, client):
-#     response = client.get("/?page=1")
-#     assert b"/?page=0" not in response.data
-#     assert b"/?page=2" in response.data
+def test_pagination_links_on_index_pages(numbered_posts, client):
+    response = client.get("/?page=1")
+    assert b"/?page=0" not in response.data
+    assert b"/?page=2" in response.data
 
-#     response = client.get("/?page=2")
-#     assert b"/?page=1" in response.data
-#     assert b"/?page=3" in response.data
+    response = client.get("/?page=2")
+    assert b"/?page=1" in response.data
+    assert b"/?page=3" in response.data
 
-#     response = client.get("/?page=3")
-#     assert b"/?page=2" in response.data
-#     assert b"/?page=4" not in response.data
+    response = client.get("/?page=3")
+    assert b"/?page=2" in response.data
+    assert b"/?page=4" not in response.data
