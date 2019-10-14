@@ -43,3 +43,4 @@ def save_image_to_upload_dir(filestrorage_obj, _filename=None):
     save_image_path = os.path.join(
         current_app.config["UPLOAD_DIR"], filename)
     filestrorage_obj.save(dst=save_image_path)
+    return filename

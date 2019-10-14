@@ -61,10 +61,13 @@ def test_save_image_to_upload_dir_with_given_filename(app):
                 not in os.listdir(app.config["UPLOAD_DIR"]))
 
         # Saving file
-        images.save_image_to_upload_dir(filestrorage_obj=filestorage,
-                                        _filename=example_image.filename)
+        saved_filename = images.save_image_to_upload_dir(
+            filestrorage_obj=filestorage,
+            _filename=example_image.filename
+        )
 
         # File exists
+        assert saved_filename == example_image.filename
         assert (example_image.filename
                 in os.listdir(app.config["UPLOAD_DIR"]))
         saved_image_path = os.path.join(app.config["UPLOAD_DIR"],
@@ -88,7 +91,8 @@ def test_save_image_to_upload_dir_without_given_filename(app):
         assert len(uploaded_files) == 0
 
         # Saving file
-        images.save_image_to_upload_dir(filestrorage_obj=filestorage)
+        saved_filename = images.save_image_to_upload_dir(
+            filestrorage_obj=filestorage)
 
         uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
         assert len(uploaded_files) == 1
@@ -96,7 +100,7 @@ def test_save_image_to_upload_dir_without_given_filename(app):
         assert (example_image.filename
                 not in uploaded_files)
 
-        saved_filename = uploaded_files[0]
+        assert uploaded_files[0] == saved_filename
         _, saved_fileextension = os.path.splitext(saved_filename)
         assert saved_fileextension == ".png"
         # But the content is correct
@@ -105,3 +109,52 @@ def test_save_image_to_upload_dir_without_given_filename(app):
         with open(saved_image_path, mode="rb") as f:
             saved_image_content = f.read()
         assert saved_image_content == example_image.content
+
+
+def test_sending_image_to_create_post_view_adds_the_file_to_upload_dir(
+        app, client, auth):
+    auth.login()
+    example_image = ExampleImage()
+    with app.test_request_context():
+        # No uploads yet
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
+
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": [(example_image.fileobject, example_image.filename)]
+        }
+        response = client.post(
+            url_for("blog.create"), data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 1
+        saved_filename = uploaded_files[0]
+        saved_image_path = os.path.join(app.config["UPLOAD_DIR"],
+                                        saved_filename)
+        with open(saved_image_path, mode="rb") as f:
+            saved_image_content = f.read()
+        assert saved_image_content == example_image.content
+
+
+def test_sending_empty_value_for_image_to_create_post_view(
+        app, client, auth):
+    auth.login()
+    with app.test_request_context():
+        # No uploads yet
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
+
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": []
+        }
+        response = client.post(
+            url_for("blog.create"), data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
