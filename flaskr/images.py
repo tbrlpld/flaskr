@@ -1,4 +1,4 @@
-from flask import Blueprint, request, send_from_directory, current_app
+from flask import Blueprint, send_from_directory, current_app
 
 
 bp = Blueprint("images", __name__, url_prefix="/images")

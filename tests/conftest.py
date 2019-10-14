@@ -25,13 +25,6 @@ def app():
         init_db()
         get_db().executescript(_data_sql)
 
-    example_image_filename = "example.png"
-    example_image_path = os.path.join(
-        os.path.dirname(__file__), example_image_filename)
-    shutil.copyfile(example_image_path,
-                    os.path.join(app.config["UPLOAD_DIR"],
-                                 example_image_filename))
-
     yield app
 
     os.close(db_fd)

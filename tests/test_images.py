@@ -1,9 +1,21 @@
+import os
+import shutil
+
+import pytest
 from flask import url_for
 
-import os
+
+@pytest.fixture
+def example_image_to_upload_dir(app):
+    example_image_filename = "example.png"
+    example_image_path = os.path.join(
+        os.path.dirname(__file__), example_image_filename)
+    shutil.copyfile(example_image_path,
+                    os.path.join(app.config["UPLOAD_DIR"],
+                                 example_image_filename))
 
 
-def test_get_example_image_from_url(app, client):
+def test_get_example_image_from_url(app, client, example_image_to_upload_dir):
     with app.app_context():
         example_image_filename = "example.png"
         assert example_image_filename in os.listdir(app.config["UPLOAD_DIR"])
