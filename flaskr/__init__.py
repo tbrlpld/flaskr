@@ -9,6 +9,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
+        UPLOAD_DIR=os.path.join(app.instance_path, "uploads"),
         POSTS_PER_PAGE=5
     )
 
@@ -22,6 +23,11 @@ def create_app(test_config=None):
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
+    try:
+        os.makedirs(app.config["UPLOAD_DIR"])
     except OSError:
         pass
 
@@ -51,5 +57,8 @@ def create_app(test_config=None):
 
     from . import search
     app.register_blueprint(search.bp)
+
+    from . import images
+    app.register_blueprint(images.bp)
 
     return app
