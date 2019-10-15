@@ -16,6 +16,11 @@
 				<a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
 			{% endif %}
 		</header>
+		{% if post['image_filename'] %}
+			<div class="post-image-container">
+				<img class="post-image" src="{{ url_for('images.get', filename=post['image_filename']) }}">
+			</div>
+		{% endif %}
 		<p class="body">{{ post['body'] }}</p>
 		<footer>
 			<div class="like-container">

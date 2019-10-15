@@ -18,12 +18,14 @@ bp = Blueprint("blog", __name__)
 def get_post(id, check_author=True):
     post = get_db().execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
-        " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        " GROUP_CONCAT(t.name, ' ') AS tag_string,"
+        " pi.filename AS image_filename"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
         # LEFT JOIN makes the existence of values in the right table optional!
         " LEFT JOIN post_tag pt ON p.id = pt.post_id"
         " LEFT JOIN tag t ON pt.tag_id = t.id"
+        " LEFT JOIN post_image pi ON p.id = pi.post_id"
         " WHERE p.id = ?"
         " GROUP BY p.id",
         (id,)

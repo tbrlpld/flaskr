@@ -297,3 +297,25 @@ def test_file_input_for_image_on_post_update_view(app, client, auth):
         # The enctype is required by flask to have data actually being attached
         # to the request object.
         assert b'enctype="multipart/form-data"' in response.data
+
+
+def test_image_url_on_post_detail_page(app, client, auth):
+    auth.login()
+    example_image = ExampleImage()
+    with app.test_request_context():
+        # Adding image to post 1
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": [(example_image.fileobject, example_image.filename)]
+        }
+        response = client.post(
+            "/1/update", data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+
+        # The associated files should be in the uploads
+        associated_image_filename = images.get_image_of_post(post_id=1)
+        assert associated_image_filename is not None
+
+        response = client.get("/1/detail")
+        assert bytes(associated_image_filename, encoding="utf8") in response.data
