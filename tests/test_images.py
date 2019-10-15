@@ -220,28 +220,12 @@ def test_save_image_and_update_image_association(app):
         assert associated_image_filename_2 in uploaded_files
 
 
-# def test_save_image_and_update_post_image_association(app):
-#     example_image_1 = ExampleImage()
-#     example_image_1.filename = "example-1.png"
-#     example_image_2 = ExampleImage()
-#     example_image_2.filename = "example-2.png"
-#     with app.app_context():
-#         # Preparing the initial status
-#         shutil.copyfile(example_image_1.path,
-#                         os.path.join(app.config["UPLOAD_DIR"],
-#                                      example_image_1.filename))
-#         images.create_post_image_association(
-#             post_id=1, filename=example_image_1.filename)
-#         assert images.get_image_of_post(post_id=1) == example_image_1.filename
-#         assert example_image_1.filename in os.listdir(app.config["UPLOAD_DIR"])
-
-
-@pytest.mark.parametrize("path", (
-    "/create",
-    "/1/update",
+@pytest.mark.parametrize(("path", "post_id"), (
+    ("/create", 2),
+    ("/1/update", 1)
 ))
-def test_create_or_update_post_view_adds_the_file_to_upload_dir(
-        app, client, auth, path):
+def test_post_view_saves_files_and_creates_association(
+        app, client, auth, path, post_id):
     auth.login()
     example_image = ExampleImage()
     with app.test_request_context():
@@ -258,11 +242,15 @@ def test_create_or_update_post_view_adds_the_file_to_upload_dir(
             path, data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
+        # The associated files should be in the uploads
+        associated_image_filename = images.get_image_of_post(post_id=post_id)
+        assert associated_image_filename is not None
         uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
         assert len(uploaded_files) == 1
-        saved_filename = uploaded_files[0]
+        assert associated_image_filename in uploaded_files
+        # The associated file should have the example files content
         saved_image_path = os.path.join(app.config["UPLOAD_DIR"],
-                                        saved_filename)
+                                        associated_image_filename)
         with open(saved_image_path, mode="rb") as f:
             saved_image_content = f.read()
         assert saved_image_content == example_image.content
@@ -287,3 +275,5 @@ def test_sending_empty_value_for_image_to_create_post_view(
 
         uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
         assert len(uploaded_files) == 0
+        associated_image_filename = images.get_image_of_post(post_id=2)
+        assert associated_image_filename is None

@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
-from flaskr.images import save_image_to_upload_dir
+from flaskr.images import save_image_and_create_or_update_post_association
 from flaskr.likes import get_users_liking_post
 from flaskr.pagination import Pagination
 from flaskr.tags import update_tag_associations_for_post
@@ -142,7 +142,10 @@ def create_or_update_post(id=None):
                 id = create_post(title, body, g.user["id"])
             update_tag_associations_for_post(tag_string=tag_string, post_id=id)
             if image:
-                save_image_to_upload_dir(image)
+                save_image_and_create_or_update_post_association(
+                    image=image,
+                    post_id=id
+                )
             return redirect(url_for("blog.index"))
 
     return render_template("blog/create_or_update.html", post=post)
