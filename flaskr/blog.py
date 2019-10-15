@@ -7,7 +7,8 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
-from flaskr.images import save_image_and_create_or_update_post_association
+from flaskr.images import (save_image_and_create_or_update_post_association,
+                           delete_post_image_associations_of_post)
 from flaskr.likes import get_users_liking_post
 from flaskr.pagination import Pagination
 from flaskr.tags import update_tag_associations_for_post
@@ -130,6 +131,7 @@ def create_or_update_post(id=None):
         body = request.form["body"]
         tag_string = request.form.get("tags", "")
         image = request.files.get("image", None)
+        delete_image = request.form.get("delete-image", False)
         error = None
 
         if not title:
@@ -143,6 +145,8 @@ def create_or_update_post(id=None):
             else:
                 id = create_post(title, body, g.user["id"])
             update_tag_associations_for_post(tag_string=tag_string, post_id=id)
+            if delete_image:
+                delete_post_image_associations_of_post(post_id=id)
             if image:
                 save_image_and_create_or_update_post_association(
                     image=image,

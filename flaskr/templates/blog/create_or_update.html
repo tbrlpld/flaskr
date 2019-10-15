@@ -25,10 +25,11 @@
 		{% if not post['image_filename'] %}
 			<input type="file" name="image">
 		{% else %}
-			<div>
+			<div class="post-image-change-container">
 				<img class="post-image-preview" src="{{ url_for('images.get', filename=post['image_filename']) }}">
+				<input type="checkbox" name="delete-image" value=false>
+				<label for="delete-image">Delete Image?</label>
 			</div>
-			<input form="delete-association" class="danger" type="submit" value="Delete Image">
 		{% endif %}
 
 		<label for="tags">Tags</label>
@@ -37,10 +38,6 @@
 
 		<input type="submit" value="Save">
 	</form>
-
-	{% if post['image_filename'] %}
-		<form id="delete-association" action="{{ url_for('images.delete_post_image_association_of_post_per_url', post_id=post['id']) }}" method="post"></form>
-	{% endif %}
 
 
 	{% if post %}

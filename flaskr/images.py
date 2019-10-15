@@ -117,13 +117,6 @@ def delete_post_image_associations_of_post(post_id):
     db.commit()
 
 
-@bp.route("/remove-associations/<int:post_id>", methods=("POST",))
-@login_required
-def delete_post_image_association_of_post_per_url(post_id):
-    delete_post_image_associations_of_post(post_id=post_id)
-    return redirect(url_for("blog.update", id=post_id))
-
-
 def save_image_and_create_or_update_post_association(image, post_id):
     """
     Save image and associate it with the post

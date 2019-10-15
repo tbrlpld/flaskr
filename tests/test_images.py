@@ -322,30 +322,7 @@ def test_image_url_on_post_detail_page(app, client, auth):
             associated_image_filename, encoding="utf8") in response.data
 
 
-def test_delete_image_association_via_url(app, client, auth):
-    auth.login()
-    example_image = ExampleImage()
-    with app.app_context():
-        # Adding image to post 1
-        form_data = {
-            "title": "post with image",
-            "body": "some body",
-            "image": [(example_image.fileobject, example_image.filename)]
-        }
-        response = client.post(
-            "/1/update", data=form_data, follow_redirects=True)
-        assert response.status_code == 200
-        associated_image_filename = images.get_image_of_post(post_id=1)
-        assert associated_image_filename is not None
-
-        # Removing association via URL
-        response = client.post("/images/remove-associations/1")
-        assert response.headers["Location"] == "http://localhost/1/update"
-        associated_image_filename = images.get_image_of_post(post_id=1)
-        assert associated_image_filename is None
-
-
-def test_post_with_image_shows_image_and_image_delete_link_on_update_page(
+def test_post_with_image_shows_image_on_update_page_(
         app, client, auth):
     auth.login()
     example_image = ExampleImage()
@@ -367,6 +344,28 @@ def test_post_with_image_shows_image_and_image_delete_link_on_update_page(
         response = client.get("/1/update")
         assert bytes(
             associated_image_filename, encoding="utf8") in response.data
-        delete_url = url_for("images.delete_post_image_association_of_post_per_url",
-                             post_id=1)
-        assert bytes(delete_url, encoding="utf8") in response.data
+
+
+def test_delete_image_association_via_update_form(app, client, auth):
+    auth.login()
+    example_image = ExampleImage()
+    with app.test_request_context():
+        # Adding image to post 1
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": [(example_image.fileobject, example_image.filename)]
+        }
+        client.post("/1/update", data=form_data)
+        # The check association exists
+        assert images.get_image_of_post(post_id=1) is not None
+
+        # Remove image association via update form
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "delete-image": True
+        }
+        client.post("/1/update", data=form_data)
+        # Check association is removed
+        assert images.get_image_of_post(post_id=1) is None
