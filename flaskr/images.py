@@ -113,3 +113,25 @@ def delete_post_image_associations_of_post(post_id):
         (post_id,)
     )
     db.commit()
+
+
+def save_image_and_create_or_update_post_association(image, post_id):
+    """
+    Save image and associate it with the post
+
+    If the post already has an image associated with it, that association and
+    file are deleted.
+
+    :param image: FileStorage object that is attached to the request
+                  when uploaded and which shall be stored and associated with
+                  the post
+    :type image: werkzeug.datastructures.FileStorage
+
+    :param post_id: Id of the post to which the image shall be associated.
+    :type post_id: int
+    """
+    current_associatied_image = get_image_of_post(post_id=post_id)
+    if current_associatied_image:
+        delete_post_image_associations_of_post(post_id=post_id)
+    saved_filename = save_image_to_upload_dir(filestrorage_obj=image)
+    create_post_image_association(post_id=post_id, filename=saved_filename)

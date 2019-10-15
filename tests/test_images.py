@@ -112,59 +112,6 @@ def test_save_image_to_upload_dir_without_given_filename(app):
         assert saved_image_content == example_image.content
 
 
-@pytest.mark.parametrize("path", (
-    "/create",
-    "/1/update",
-))
-def test_create_or_update_post_view_adds_the_file_to_upload_dir(
-        app, client, auth, path):
-    auth.login()
-    example_image = ExampleImage()
-    with app.test_request_context():
-        # No uploads yet
-        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
-        assert len(uploaded_files) == 0
-
-        form_data = {
-            "title": "post with image",
-            "body": "some body",
-            "image": [(example_image.fileobject, example_image.filename)]
-        }
-        response = client.post(
-            path, data=form_data, follow_redirects=True)
-        assert response.status_code == 200
-
-        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
-        assert len(uploaded_files) == 1
-        saved_filename = uploaded_files[0]
-        saved_image_path = os.path.join(app.config["UPLOAD_DIR"],
-                                        saved_filename)
-        with open(saved_image_path, mode="rb") as f:
-            saved_image_content = f.read()
-        assert saved_image_content == example_image.content
-
-
-def test_sending_empty_value_for_image_to_create_post_view(
-        app, client, auth):
-    auth.login()
-    with app.test_request_context():
-        # No uploads yet
-        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
-        assert len(uploaded_files) == 0
-
-        form_data = {
-            "title": "post with image",
-            "body": "some body",
-            "image": []
-        }
-        response = client.post(
-            url_for("blog.create"), data=form_data, follow_redirects=True)
-        assert response.status_code == 200
-
-        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
-        assert len(uploaded_files) == 0
-
-
 def test_post_image_association_none_exising_file(app):
     with app.app_context():
         # To create an association, the file has to exist in the upload
@@ -218,3 +165,125 @@ def test_delete_post_image_associations_of_post(
         images.delete_post_image_associations_of_post(post_id=1)
         assert images.get_image_of_post(post_id=1) is None
         assert image_filename not in os.listdir(app.config["UPLOAD_DIR"])
+
+
+def test_save_image_and_create_image_association(app):
+    example_image = ExampleImage()
+    filestorage = FileStorage(
+        stream=example_image.fileobject,
+        filename=example_image.filename)
+    with app.app_context():
+        # File does not exist
+        assert len(os.listdir(app.config["UPLOAD_DIR"])) == 0
+
+        # Saving file
+        images.save_image_and_create_or_update_post_association(
+            image=filestorage, post_id=1)
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 1
+        associated_image_filename = images.get_image_of_post(post_id=1)
+        assert associated_image_filename is not None
+        assert associated_image_filename in uploaded_files
+
+
+def test_save_image_and_update_image_association(app):
+    example_image = ExampleImage()
+    filestorage = FileStorage(
+        stream=example_image.fileobject,
+        filename=example_image.filename)
+    with app.app_context():
+        # File does not exist
+        assert len(os.listdir(app.config["UPLOAD_DIR"])) == 0
+
+        # Saving file for the first time
+        images.save_image_and_create_or_update_post_association(
+            image=filestorage, post_id=1)
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 1
+        associated_image_filename_1 = images.get_image_of_post(post_id=1)
+        assert associated_image_filename_1 is not None
+        assert associated_image_filename_1 in uploaded_files
+
+        # Saving the image again
+        images.save_image_and_create_or_update_post_association(
+            image=filestorage, post_id=1)
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        # There should still be only one file in the upload folder, because
+        # the first one should be deleted.
+        assert len(uploaded_files) == 1
+        associated_image_filename_2 = images.get_image_of_post(post_id=1)
+        # The name of the associated file should have changed and that should
+        # the uploaded file.
+        assert associated_image_filename_2 is not associated_image_filename_1
+        assert associated_image_filename_2 in uploaded_files
+
+
+# def test_save_image_and_update_post_image_association(app):
+#     example_image_1 = ExampleImage()
+#     example_image_1.filename = "example-1.png"
+#     example_image_2 = ExampleImage()
+#     example_image_2.filename = "example-2.png"
+#     with app.app_context():
+#         # Preparing the initial status
+#         shutil.copyfile(example_image_1.path,
+#                         os.path.join(app.config["UPLOAD_DIR"],
+#                                      example_image_1.filename))
+#         images.create_post_image_association(
+#             post_id=1, filename=example_image_1.filename)
+#         assert images.get_image_of_post(post_id=1) == example_image_1.filename
+#         assert example_image_1.filename in os.listdir(app.config["UPLOAD_DIR"])
+
+
+@pytest.mark.parametrize("path", (
+    "/create",
+    "/1/update",
+))
+def test_create_or_update_post_view_adds_the_file_to_upload_dir(
+        app, client, auth, path):
+    auth.login()
+    example_image = ExampleImage()
+    with app.test_request_context():
+        # No uploads yet
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
+
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": [(example_image.fileobject, example_image.filename)]
+        }
+        response = client.post(
+            path, data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 1
+        saved_filename = uploaded_files[0]
+        saved_image_path = os.path.join(app.config["UPLOAD_DIR"],
+                                        saved_filename)
+        with open(saved_image_path, mode="rb") as f:
+            saved_image_content = f.read()
+        assert saved_image_content == example_image.content
+
+
+def test_sending_empty_value_for_image_to_create_post_view(
+        app, client, auth):
+    auth.login()
+    with app.test_request_context():
+        # No uploads yet
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
+
+        form_data = {
+            "title": "post with image",
+            "body": "some body",
+            "image": []
+        }
+        response = client.post(
+            url_for("blog.create"), data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
