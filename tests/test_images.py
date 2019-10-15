@@ -277,3 +277,23 @@ def test_sending_empty_value_for_image_to_create_post_view(
         assert len(uploaded_files) == 0
         associated_image_filename = images.get_image_of_post(post_id=2)
         assert associated_image_filename is None
+
+
+def test_file_input_for_image_on_post_create_view(app, client, auth):
+    auth.login()
+    with app.test_request_context():
+        response = client.get(url_for("blog.create"))
+        assert b'<input type="file" name="image">' in response.data
+        # The enctype is required by flask to have data actually being attached
+        # to the request object.
+        assert b'enctype="multipart/form-data"' in response.data
+
+
+def test_file_input_for_image_on_post_update_view(app, client, auth):
+    auth.login()
+    with app.test_request_context():
+        response = client.get(url_for("blog.update", id=1))
+        assert b'<input type="file" name="image">' in response.data
+        # The enctype is required by flask to have data actually being attached
+        # to the request object.
+        assert b'enctype="multipart/form-data"' in response.data
