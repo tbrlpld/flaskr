@@ -92,3 +92,19 @@ def get_image_of_post(post_id):
     if row:
         return row["filename"]
     return None
+
+
+def delete_post_image_associations_of_post(post_id):
+    """
+    Delete post-image association for given post
+
+    :param post_id: Id of the post for which the image associations shall be
+                    deleted
+    :type post_id: int
+    """
+    db = get_db()
+    db.execute(
+        "DELETE FROM post_image WHERE post_id = ?",
+        (post_id,)
+    )
+    db.commit()

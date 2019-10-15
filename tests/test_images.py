@@ -205,5 +205,14 @@ def test_get_image_of_post(app, example_image_to_upload_dir):
         assert image_filename == example_image.filename
 
 
+def test_delete_post_image_associations_of_post(
+        app, example_image_to_upload_dir):
+    example_image = ExampleImage()
+    with app.app_context():
+        images.create_post_image_association(
+            post_id=1, filename=example_image.filename)
+        image_filename = images.get_image_of_post(post_id=1)
+        assert image_filename == example_image.filename
 
-
+        images.delete_post_image_associations_of_post(post_id=1)
+        assert images.get_image_of_post(post_id=1) is None
