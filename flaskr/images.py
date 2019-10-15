@@ -96,12 +96,17 @@ def get_image_of_post(post_id):
 
 def delete_post_image_associations_of_post(post_id):
     """
-    Delete post-image association for given post
+    Delete post-image association and image for given post
+
+    The image on disk is also deleted.
 
     :param post_id: Id of the post for which the image associations shall be
                     deleted
     :type post_id: int
     """
+    image_filename = get_image_of_post(post_id)
+    os.remove(
+        os.path.join(current_app.config["UPLOAD_DIR"], image_filename))
     db = get_db()
     db.execute(
         "DELETE FROM post_image WHERE post_id = ?",

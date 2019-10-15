@@ -213,6 +213,8 @@ def test_delete_post_image_associations_of_post(
             post_id=1, filename=example_image.filename)
         image_filename = images.get_image_of_post(post_id=1)
         assert image_filename == example_image.filename
+        assert image_filename in os.listdir(app.config["UPLOAD_DIR"])
 
         images.delete_post_image_associations_of_post(post_id=1)
         assert images.get_image_of_post(post_id=1) is None
+        assert image_filename not in os.listdir(app.config["UPLOAD_DIR"])
