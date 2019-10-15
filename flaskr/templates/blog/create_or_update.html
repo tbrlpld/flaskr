@@ -19,7 +19,7 @@
 			value="{{ request.form['title'] or post['title'] }}" required>
 
 		<label for="body">Body</label>
-		<textarea name="body" id="body">{{ request.form['title'] or post['body'] }}</textarea>
+		<textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
 
 		<label for="image">Image</label>
 		{% if not post['image_filename'] %}
@@ -28,6 +28,7 @@
 			<div>
 				<img class="post-image-preview" src="{{ url_for('images.get', filename=post['image_filename']) }}">
 			</div>
+			<input form="delete-association" class="danger" type="submit" value="Delete Image">
 		{% endif %}
 
 		<label for="tags">Tags</label>
@@ -36,6 +37,11 @@
 
 		<input type="submit" value="Save">
 	</form>
+
+	{% if post['image_filename'] %}
+		<form id="delete-association" action="{{ url_for('images.delete_post_image_association_of_post_per_url', post_id=post['id']) }}" method="post"></form>
+	{% endif %}
+
 
 	{% if post %}
 	<form action="{{ url_for('blog.delete', id=post['id']) }}" method="post">

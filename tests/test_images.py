@@ -345,7 +345,8 @@ def test_delete_image_association_via_url(app, client, auth):
         assert associated_image_filename is None
 
 
-def test_image_url_on_post_update_page_for_post_with_image(app, client, auth):
+def test_post_with_image_shows_image_and_image_delete_link_on_update_page(
+        app, client, auth):
     auth.login()
     example_image = ExampleImage()
     with app.test_request_context():
@@ -366,5 +367,6 @@ def test_image_url_on_post_update_page_for_post_with_image(app, client, auth):
         response = client.get("/1/update")
         assert bytes(
             associated_image_filename, encoding="utf8") in response.data
-
-
+        delete_url = url_for("images.delete_post_image_association_of_post_per_url",
+                             post_id=1)
+        assert bytes(delete_url, encoding="utf8") in response.data
