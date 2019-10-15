@@ -22,7 +22,13 @@
 		<textarea name="body" id="body">{{ request.form['title'] or post['body'] }}</textarea>
 
 		<label for="image">Image</label>
-		<input type="file" name="image">
+		{% if not post['image_filename'] %}
+			<input type="file" name="image">
+		{% else %}
+			<div>
+				<img class="post-image-preview" src="{{ url_for('images.get', filename=post['image_filename']) }}">
+			</div>
+		{% endif %}
 
 		<label for="tags">Tags</label>
 		<input name="tags" id="tags"
@@ -33,7 +39,9 @@
 
 	{% if post %}
 	<form action="{{ url_for('blog.delete', id=post['id']) }}" method="post">
-		<input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+		<input class="danger" type="submit" value="Delete Post" onclick="return confirm('Are you sure?');">
 	</form>
 	{% endif %}
+
+
 {% endblock %}

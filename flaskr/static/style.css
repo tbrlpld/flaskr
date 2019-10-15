@@ -84,3 +84,6 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .post-image {
 	max-height: 350px;
 }
+.post-image-preview {
+	max-height: 50px;
+}
