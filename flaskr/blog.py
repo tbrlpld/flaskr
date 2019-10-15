@@ -7,6 +7,8 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
 from flaskr.db import get_db
+from flaskr.images import (save_image_and_create_or_update_post_association,
+                           delete_post_image_associations_of_post)
 from flaskr.likes import get_users_liking_post
 from flaskr.pagination import Pagination
 from flaskr.tags import update_tag_associations_for_post
@@ -17,12 +19,14 @@ bp = Blueprint("blog", __name__)
 def get_post(id, check_author=True):
     post = get_db().execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
-        " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        " GROUP_CONCAT(t.name, ' ') AS tag_string,"
+        " pi.filename AS image_filename"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
         # LEFT JOIN makes the existence of values in the right table optional!
         " LEFT JOIN post_tag pt ON p.id = pt.post_id"
         " LEFT JOIN tag t ON pt.tag_id = t.id"
+        " LEFT JOIN post_image pi ON p.id = pi.post_id"
         " WHERE p.id = ?"
         " GROUP BY p.id",
         (id,)
@@ -126,6 +130,8 @@ def create_or_update_post(id=None):
         title = request.form["title"]
         body = request.form["body"]
         tag_string = request.form.get("tags", "")
+        image = request.files.get("image", None)
+        delete_image = request.form.get("delete-image", False)
         error = None
 
         if not title:
@@ -139,6 +145,13 @@ def create_or_update_post(id=None):
             else:
                 id = create_post(title, body, g.user["id"])
             update_tag_associations_for_post(tag_string=tag_string, post_id=id)
+            if delete_image:
+                delete_post_image_associations_of_post(post_id=id)
+            if image:
+                save_image_and_create_or_update_post_association(
+                    image=image,
+                    post_id=id
+                )
             return redirect(url_for("blog.index"))
 
     return render_template("blog/create_or_update.html", post=post)

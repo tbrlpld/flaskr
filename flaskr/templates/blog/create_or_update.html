@@ -13,13 +13,24 @@
 {% endblock %}
 
 {% block content %}
-	<form method="post">
+	<form method="post" enctype="multipart/form-data">
 		<label for="title">Title</label>
 		<input name="title" id="title"
 			value="{{ request.form['title'] or post['title'] }}" required>
 
 		<label for="body">Body</label>
-		<textarea name="body" id="body">{{ request.form['title'] or post['body'] }}</textarea>
+		<textarea name="body" id="body">{{ request.form['body'] or post['body'] }}</textarea>
+
+		<label for="image">Image</label>
+		{% if not post['image_filename'] %}
+			<input type="file" name="image">
+		{% else %}
+			<div class="post-image-change-container">
+				<img class="post-image-preview" src="{{ url_for('images.get', filename=post['image_filename']) }}">
+				<input type="checkbox" name="delete-image" value=false>
+				<label for="delete-image">Delete Image?</label>
+			</div>
+		{% endif %}
 
 		<label for="tags">Tags</label>
 		<input name="tags" id="tags"
@@ -28,9 +39,12 @@
 		<input type="submit" value="Save">
 	</form>
 
+
 	{% if post %}
 	<form action="{{ url_for('blog.delete', id=post['id']) }}" method="post">
-		<input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+		<input class="danger" type="submit" value="Delete Post" onclick="return confirm('Are you sure?');">
 	</form>
 	{% endif %}
+
+
 {% endblock %}

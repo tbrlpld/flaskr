@@ -56,3 +56,10 @@ CREATE TABLE post_tag (
 	FOREIGN KEY (tag_id) REFERENCES tag (id),
 	CONSTRAINT post_tag_relation UNIQUE (post_id, tag_id)
 );
+
+CREATE TABLE post_image (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	post_id INTEGER NOT NULL,
+	filename TEXT NOT NULL, 
+	FOREIGN KEY (post_id) REFERENCES post (id)
+);

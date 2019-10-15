@@ -78,3 +78,16 @@ input[type=submit] { align-self: start; min-width: 10em; }
 .pagination {
 	margin: 1rem 0;
 }
+.post-image-container {
+	text-align: center;
+}
+.post-image {
+	max-height: 350px;
+}
+.post-image-preview {
+	max-height: 50px;
+}
+.post-image-change-container > label {
+	font-size: smaller;
+	font-weight: normal;
+}
