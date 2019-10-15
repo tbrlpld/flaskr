@@ -6,6 +6,7 @@ from flask import url_for
 from werkzeug.datastructures import FileStorage
 
 from flaskr import images
+from flaskr.db import get_db
 
 
 class ExampleImage(object):
@@ -111,8 +112,12 @@ def test_save_image_to_upload_dir_without_given_filename(app):
         assert saved_image_content == example_image.content
 
 
-def test_sending_image_to_create_post_view_adds_the_file_to_upload_dir(
-        app, client, auth):
+@pytest.mark.parametrize("path", (
+    "/create",
+    "/1/update",
+))
+def test_create_or_update_post_view_adds_the_file_to_upload_dir(
+        app, client, auth, path):
     auth.login()
     example_image = ExampleImage()
     with app.test_request_context():
@@ -126,7 +131,7 @@ def test_sending_image_to_create_post_view_adds_the_file_to_upload_dir(
             "image": [(example_image.fileobject, example_image.filename)]
         }
         response = client.post(
-            url_for("blog.create"), data=form_data, follow_redirects=True)
+            path, data=form_data, follow_redirects=True)
         assert response.status_code == 200
 
         uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
@@ -158,3 +163,47 @@ def test_sending_empty_value_for_image_to_create_post_view(
 
         uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
         assert len(uploaded_files) == 0
+
+
+def test_post_image_association_none_exising_file(app):
+    with app.app_context():
+        # To create an association, the file has to exist in the upload
+        # directory or an Exception is raised
+        uploaded_files = os.listdir(app.config["UPLOAD_DIR"])
+        assert len(uploaded_files) == 0
+
+        filenotfound_raised = False
+        try:
+            images.create_post_image_association(
+                post_id=1, filename="example.png")
+        except FileNotFoundError:
+            filenotfound_raised = True
+        assert filenotfound_raised
+
+
+def test_new_post_image_association(app, example_image_to_upload_dir):
+    with app.app_context():
+        images.create_post_image_association(
+            post_id=1, filename="example.png")
+        db = get_db()
+        result = db.execute(
+            "SELECT post_id, filename FROM post_image WHERE post_id = 1"
+        ).fetchone()
+        assert result["post_id"] == 1
+        assert result["filename"] == "example.png"
+
+
+def test_get_image_of_post(app, example_image_to_upload_dir):
+    example_image = ExampleImage()
+    with app.app_context():
+        response_before_association = images.get_image_of_post(post_id=1)
+        assert response_before_association is None
+
+        images.create_post_image_association(
+            post_id=1, filename=example_image.filename)
+        image_filename = images.get_image_of_post(post_id=1)
+        assert image_filename == example_image.filename
+
+
+
+
