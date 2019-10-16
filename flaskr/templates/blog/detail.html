@@ -21,7 +21,7 @@
 				<img class="post-image" src="{{ url_for('images.get', filename=post['image_filename']) }}">
 			</div>
 		{% endif %}
-		<p class="body">{{ post['body'] }}</p>
+		<p class="body">{{ post['body_html']|safe }}</p>
 		<footer>
 			<div class="like-container">
 				<span>{{ users_likes|length }} Likes</span>

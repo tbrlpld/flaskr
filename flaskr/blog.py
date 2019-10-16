@@ -20,7 +20,7 @@ bp = Blueprint("blog", __name__)
 def get_post(id, check_author=True):
     post = get_db().execute(
         "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
-        " GROUP_CONCAT(t.name, ' ') AS tag_string,"
+        " p.body_html, GROUP_CONCAT(t.name, ' ') AS tag_string,"
         " pi.filename AS image_filename"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
