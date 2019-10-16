@@ -3,6 +3,7 @@ from flask import (
     current_app
 )
 from werkzeug.exceptions import abort
+from markdown2 import markdown
 
 from flaskr.auth import login_required
 from flaskr.comments import get_comments_for_post
@@ -103,9 +104,9 @@ def create_post(title, body, author_id):
     """
     db = get_db()
     cursor = db.execute(
-        "INSERT INTO post (title, body, author_id)"
-        " VALUES (?, ?, ?)",
-        (title, body, author_id)
+        "INSERT INTO post (title, body, body_html,author_id)"
+        " VALUES (?, ?, ?, ?)",
+        (title, body, markdown(body), author_id)
     )
     db.commit()
     return cursor.lastrowid
@@ -114,9 +115,9 @@ def create_post(title, body, author_id):
 def update_post(id, title, body):
     db = get_db()
     db.execute(
-        "UPDATE post SET title = ?, body = ?"
+        "UPDATE post SET title = ?, body = ?, body_html = ?"
         " WHERE id = ?",
-        (title, body, id)
+        (title, body, markdown(body), id)
     )
     db.commit()
 
