@@ -2,6 +2,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for,
     current_app
 )
+from markdown2 import markdown
+from markupsafe import escape
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
@@ -18,8 +20,8 @@ bp = Blueprint("blog", __name__)
 
 def get_post(id, check_author=True):
     post = get_db().execute(
-        "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
-        " GROUP_CONCAT(t.name, ' ') AS tag_string,"
+        "SELECT p.id, p.title, p.body, p.body_html,  p.created, p.author_id,"
+        "  u.username, GROUP_CONCAT(t.name, ' ') AS tag_string,"
         " pi.filename AS image_filename"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
@@ -51,8 +53,8 @@ def index():
         items_per_page=current_app.config["POSTS_PER_PAGE"],
         current_page=page)
     posts = db.execute(
-        "SELECT p.id, p.title, p.body, p.created, p.author_id, u.username,"
-        " GROUP_CONCAT(t.name, ' ') AS tag_string"
+        "SELECT p.id, p.title, p.body, p.body_html, p.created, p.author_id,"
+        " u.username, GROUP_CONCAT(t.name, ' ') AS tag_string"
         " FROM post p"
         " JOIN user u ON p.author_id = u.id"
         # LEFT JOIN makes the existence of values in the right table optional!
@@ -101,11 +103,13 @@ def create_post(title, body, author_id):
     :returns: Id of the post created in the db
     :rtype: int
     """
+    # Escaping html in user input
+    body = escape(body)
     db = get_db()
     cursor = db.execute(
-        "INSERT INTO post (title, body, author_id)"
-        " VALUES (?, ?, ?)",
-        (title, body, author_id)
+        "INSERT INTO post (title, body, body_html,author_id)"
+        " VALUES (?, ?, ?, ?)",
+        (title, body, markdown(body), author_id)
     )
     db.commit()
     return cursor.lastrowid
@@ -114,9 +118,9 @@ def create_post(title, body, author_id):
 def update_post(id, title, body):
     db = get_db()
     db.execute(
-        "UPDATE post SET title = ?, body = ?"
+        "UPDATE post SET title = ?, body = ?, body_html = ?"
         " WHERE id = ?",
-        (title, body, id)
+        (title, body, markdown(body), id)
     )
     db.commit()
 
@@ -127,8 +131,8 @@ def create_or_update_post(id=None):
         post = get_post(id)  # This is also to check existence and ownership
 
     if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
+        title = escape(request.form["title"])
+        body = escape(request.form["body"])
         tag_string = request.form.get("tags", "")
         image = request.files.get("image", None)
         delete_image = request.form.get("delete-image", False)

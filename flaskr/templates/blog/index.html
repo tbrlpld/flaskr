@@ -21,7 +21,7 @@
 					<a class="action" href="{{ url_for('blog.update', id=post['id']) }}">Edit</a>
 				{% endif %}
 			</header>
-			<p class="body">{{ post['body'] }}</p>
+			<p class="body">{{ post['body_html']|safe }}</p>
 			<footer>
 				{% if post['tag_string'] %}
 					{{ display_tag_string(tag_string=post['tag_string']) }}
@@ -35,18 +35,18 @@
 	{% if pagination %}
 		{% if search %}
 			{{ display_pagination(
-				base_url=url_for("search.display_search_filtered_index", q=search), 
+				base_url=url_for("search.display_search_filtered_index", q=search),
 				pagination=pagination,
-				querystring_connector="&") 
+				querystring_connector="&")
 			}}
 		{% elif tag %}
 			{{ display_pagination(
-				base_url=url_for("tags.display_tagged_posts", tag=tag), 
-				pagination=pagination) 
+				base_url=url_for("tags.display_tagged_posts", tag=tag),
+				pagination=pagination)
 			}}
 		{% else %}
 			{{ display_pagination(
-				base_url=(url_for("index")), 
+				base_url=(url_for("index")),
 				pagination=pagination) }}
 		{% endif %}
 	{% endif %}
