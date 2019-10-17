@@ -56,7 +56,7 @@ def test_post_body_html_in_DB_is_safe(
         ).fetchone()
         assert "<h2>Test Heading</h2>" in row["body_html"]
         assert "<i>This should not be html</i>" not in row["body_html"]
-        assert "&lt;i&gt;This should not be html&lt;/i&gt;" not in row["body_html"]
+        assert "&lt;i&gt;This should not be html&lt;/i&gt;" in row["body_html"]
 
 
 @pytest.mark.parametrize("get_path", (
@@ -89,9 +89,10 @@ def test_html_in_markdown_is_escaped(client, auth, app, get_path):
             "title": "Post with markdown body",
             "body": "<i>This HTML should be escaped</i>"
         }
-        client.post(get_path, data=form_data)
+        client.post("/create", data=form_data)
 
-        response = client.get("/")
+        response = client.get(get_path)
         assert response.status_code == 200
+        print(response.data)
         assert b"<i>This HTML should be escaped</i>" not in response.data
         assert b"&lt;i&gt;This HTML should be escaped&lt;/i&gt;" in response.data
