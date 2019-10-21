@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+
+<channel>
+  <title>Flaskr</title>
+  <link>http://localhost:5000</link>
+  <description>New Post's on the Flaskr Blog</description>
+  {% for post in posts %}
+  <item>
+    <title>{{ post["title"] }}</title>
+    <link>http://localhost:5000{{ url_for("blog.detail", id=post["id"])}}</link>
+    <description>A new post by {{ post["username"]}} on Flaskr</description>
+    <pubDate>{{ post["created"] }}</pubDate>
+    <author>{{ post["username"]}}</author>
+  </item>
+  {% endfor %}
+</channel>
+
+</rss> 
