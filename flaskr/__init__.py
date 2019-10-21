@@ -61,4 +61,7 @@ def create_app(test_config=None):
     from . import images
     app.register_blueprint(images.bp)
 
+    from . import rss
+    app.register_blueprint(rss.bp)
+
     return app
