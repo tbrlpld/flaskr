@@ -1,6 +1,4 @@
-import io
-
-from flask import Blueprint, send_file, render_template
+from flask import Blueprint, render_template
 
 from flaskr.db import get_db
 
