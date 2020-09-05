@@ -7,6 +7,8 @@ The basic functionality of the blog was created by following along the tutorial 
 
 My own work really starts with the implementation of the features listed in the [Keep Developing Section](https://flask.palletsprojects.com/en/1.1.x/tutorial/next/) of the tutorial. The added features are: detail post view, likes, comments, tags, title search, pagination, image upload, markdown formatting and RSS feed.
 
+It is definitely not pretty, but that was not the point of the exercise.
+
 ## Development
 
 ### Installation
