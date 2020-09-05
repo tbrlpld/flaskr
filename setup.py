@@ -11,4 +11,7 @@ setup(
         "flask",
         "markdown2",
     ],
+    extras_require={
+        'dev': ['pytest', 'pytest-cov'],
+    },
 )
